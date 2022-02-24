@@ -1,0 +1,154 @@
+<html>
+
+<head>
+  <style type="text/css" media="print">
+    .noprint {
+      display: none;
+    }
+  </style>
+  <style type="text/css">
+    body {
+      text-align: center;
+      font-size: 40px;
+    }
+
+    input,
+    button {
+      height: 45px;
+      width: 120px;
+      font-size: 40px;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 0 auto;
+      text-align: center;
+      font-size: 40px;
+    }
+
+    table th {
+      background: #999;
+    }
+
+    table td,
+    table th {
+      border: 1px solid #cad9ea;
+    }
+
+    table th {
+      width: 100px;
+    }
+  </style>
+</head>
+
+<body onbeforeunload="check_unnload()">
+  <table id="math_table">
+    <tr>
+      <th>NO.</th>
+      <th>First</th>
+      <th>OP</th>
+      <th>Second</th>
+      <th>Equal</th>
+      <th>Result</th>
+      <th>Check</th>
+    </tr>
+  </table>
+  <br>
+  <button class="noprint" onclick="window.print()">print</button>
+  <button class="noprint" onclick="check()">check</button>
+  <font id="check_result" color="blue"></font>
+</body>
+
+</html>
+<script type="text/javascript">
+  function check_unload(e)
+  {
+    var e = window.event || e;
+    e.returnValue = ("确定离开当前页面吗？");
+  }
+
+  window.onbeforeunload = check_unload;
+
+  function init_page()
+  {
+    var mathTable = document.getElementById("math_table");
+    for (var i = 1; i <= 10; i++)
+    {
+      a = Math.round(Math.random() * 100) + 5;
+      b = Math.round(Math.random() * 80) + 5;
+      x = a;
+      y = b;
+
+      if (b > a)
+      {
+        x = b;
+        y = a;
+      }
+
+
+      if (i <= 4)
+      {
+        op = "+";
+        expected = x + y;
+      }
+      else if (i <= 7)
+      {
+        op = "-";
+        expected = x - y;
+      }
+      else if (i <= 9)
+      {
+        x = Math.round(Math.random() * 9) + 2;
+        y = Math.round(Math.random() * 10) + 2;
+        op = "x";
+        expected = x * y;
+      }
+      else
+      {
+        x = Math.round(Math.random() * 9) + 2;
+        y = Math.round(Math.random() * 9) + 2;
+
+        expected = x;
+        x = x * y;
+
+        op = "÷";
+      }
+
+      var data = "<tr><th>" + i + "</th> <td>" + x + "</td> <td>" + op +
+        "</td> <td>" + y + "</td> <td>=</td> <td><input id='result" + i +
+        "' expected='" + expected + "' type=text /></td> <td id='msg" + i +
+        "'></td></tr>";
+
+      mathTable.innerHTML = mathTable.innerHTML + data;
+    }
+  }
+
+  init_page();
+
+  function check()
+  {
+    var total = 0;
+    for (i = 1; i <= 10; i++)
+    {
+      let r = document.getElementById("result" + i);
+      let msg = document.getElementById("msg" + i);
+      if (parseInt(r.value) == parseInt(r.getAttribute("expected")))
+      {
+        msg.innerHTML = "<font color=green>10</font>";
+        total += 10;
+      }
+      else
+      {
+        msg.innerHTML = "<font color=red>0</font>"
+      }
+    }
+
+    da = new Date();
+    date = da.getFullYear() + "-" + (da.getMonth() + 1) + "-" + da.getDate();
+
+    document.getElementById("check_result").innerHTML = " Date: " +
+      date + ",  Final: " +
+      total;
+
+  }
+</script>

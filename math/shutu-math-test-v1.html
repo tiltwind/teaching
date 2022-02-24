@@ -1,0 +1,286 @@
+<html lang="en">
+
+<head>
+  <style media="print">
+    .noprint {
+      display: none;
+    }
+  </style>
+  <style>
+    body {
+      text-align: center;
+      font-size: 40px;
+    }
+
+    input,
+    button {
+      height: 45px;
+      width: 120px;
+      font-size: 30px;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 0 auto;
+      text-align: center;
+      font-size: 40px;
+    }
+
+    table th {
+      background: #999;
+    }
+
+    table td,
+    table th {
+      border: 1px solid #cad9ea;
+    }
+
+    table th {
+      width: 100px;
+    }
+  </style>
+  <title>math test</title>
+</head>
+
+<body onbeforeunload="check_unnload()">
+  <div id="container" style="display: none;">
+    <div class="noprint" style="text-align: center;" id="time_container">Time Usage: <font id="time_usage"></font>
+    </div>
+    <table id="math_table">
+      <tr>
+        <th>NO.</th>
+        <th>First</th>
+        <th>OP</th>
+        <th>Second</th>
+        <th>Equal</th>
+        <th>Result</th>
+        <th>Check</th>
+      </tr>
+    </table>
+    <br>
+    <span id="check_result" style="color: blue; "></span>
+    <br>
+    <button class="noprint" onclick="window.print()">print</button>
+    <button class="noprint" onclick="check()">check</button>
+  </div>
+
+  <div id="start_container">
+    <button onclick="init_page()">start</button>
+  </div>
+</body>
+
+</html>
+<script type="text/javascript">
+  function check_unload(e)
+  {
+    let ev = window.event || e;
+    ev.returnValue = "确定离开当前页面吗？";
+  }
+
+  window.onbeforeunload = check_unload;
+
+  let startTime = 0;
+
+  function getTimeUsage()
+  {
+    let secondUsage = parseInt((new Date().getTime() - startTime)/1000);
+
+    let usage = "";
+    let value = parseInt(secondUsage / (60 * 60));
+    if (value >= 10)
+    {
+      usage += value;
+    }
+    else
+    {
+      usage += "0" + value;
+    }
+    usage += ":"
+
+    secondUsage = secondUsage % (60 * 60);
+
+    value = parseInt(secondUsage / (60))
+    if (value >= 10)
+    {
+      usage += value;
+    }
+    else
+    {
+      usage += "0" + value;
+    }
+    usage += ":"
+
+    value = parseInt(secondUsage % 60);
+    if (value >= 10)
+    {
+      usage += value;
+    }
+    else
+    {
+      usage += "0" + value;
+    }
+    return usage;
+  }
+
+  let showTimeUsageTimer;
+  let timeUsageTimerStop = false;
+
+  function showTimeUsage()
+  {
+    document.getElementById("time_usage").innerText = getTimeUsage();
+    if (!timeUsageTimerStop){
+      showTimeUsageTimer = setTimeout("showTimeUsage()", 1000)
+    }
+  }
+
+  function stopShowTimeUsage()
+  {
+    timeUsageTimerStop = true;
+  }
+
+
+  function init_page()
+  {
+    document.getElementById("start_container").style.display = "none";
+    document.getElementById("container").style.display = "";
+
+    let mathTable = document.getElementById("math_table");
+    for (let i = 1; i <= 10; i++)
+    {
+      let startDate = new Date();
+      startDate.setFullYear(2020, 10, 1)
+      let diffDays = Math.ceil(Math.abs(new Date() - startDate) / (24 * 60 *
+        60 * 1000));
+      let diffMonths = Math.ceil(diffDays / 30);
+
+      let a = Math.round(Math.random() * diffDays) + 5;
+      let b = Math.round(Math.random() * (diffDays - 20)) + 5;
+      let x = a;
+      let y = b;
+
+      if (b > a)
+      {
+        x = b;
+        y = a;
+      }
+      let op;
+      let expected;
+
+      // -------------------------- 普通加法
+      if (i <= 3)
+      {
+        op = "+";
+        expected = x + y;
+      }
+      // -------------------------- 负数加法
+      else if (i <= 4)
+      {
+        op = "+";
+        x = Math.round(Math.random() * diffMonths) + 2;
+        y = Math.round(Math.random() * diffMonths) + 2;
+        if (x === y)
+        {
+          y = y + 1;
+        }
+
+        x = -x;
+
+        expected = x + y;
+      }
+      // -------------------------- 普通减法
+      else if (i <= 6)
+      {
+        op = "-";
+        expected = x - y;
+      }
+      // -------------------------- 负数减法
+      else if (i <= 7)
+      {
+        x = Math.round(Math.random() * diffMonths) + 2;
+        y = Math.round(Math.random() * diffMonths) + 2;
+
+        op = "-";
+        if (x === y)
+        {
+          y = y + 1;
+        }
+
+        if (x > y)
+        {
+          let z = x;
+          x = y;
+          y = z;
+        }
+
+        expected = x - y;
+      }
+
+      // -------------------------- 乘法
+      else if (i <= 9)
+      {
+        op = "x";
+        x = Math.round(Math.random() * diffMonths) + 2;
+        y = Math.round(Math.random() * diffMonths) + 2;
+        expected = x * y;
+      }
+      // -------------------------- 除法
+      else
+      {
+        x = Math.round(Math.random() * diffMonths) + 2;
+        y = Math.round(Math.random() * diffMonths) + 2;
+        expected = x;
+        x = x * y;
+
+        op = "&divide;";
+      }
+
+
+      var data = "<tr><th>" + i + "</th> <td>" + x + "</td> <td>" + op +
+        "</td> <td>" + y + "</td> <td>=</td> <td><input id='result" + i +
+        "' expected='" + expected + "' type=text /></td> <td id='msg" + i +
+        "'></td></tr>";
+
+      mathTable.innerHTML = mathTable.innerHTML + data;
+
+
+      // start time usage timer
+      startTime = new Date().getTime();
+      timeUsageTimerStop = false;
+      showTimeUsage();
+    }
+  }
+
+  //init_page();
+
+  function check()
+  {
+    let total = 0;
+    for (let i = 1; i <= 10; i++)
+    {
+      let r = document.getElementById("result" + i);
+      let msg = document.getElementById("msg" + i);
+      if (parseInt(r.value) === parseInt(r.getAttribute("expected")))
+      {
+        msg.innerHTML = "<span style=\"color: green; \">10</span>";
+        total += 10;
+      }
+      else
+      {
+        msg.innerHTML = "<span style=\"color: red; \">0</span>"
+      }
+    }
+
+    let da = new Date();
+    let date = da.getFullYear() + "-" + (da.getMonth() + 1) + "-" + da.getDate();
+
+    let resultMessage = " Date: " + date + ",  Final: " + total + " Time: " + getTimeUsage();
+
+    document.getElementById("check_result").innerHTML = resultMessage;
+
+    if (total === 100)
+    {
+      stopShowTimeUsage();
+      document.getElementById("time_container").style.display="none";
+    }
+  }
+</script>

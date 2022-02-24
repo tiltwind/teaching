@@ -1,0 +1,75 @@
+<html>
+<head>
+	<style type="text/css">
+		body{
+			
+		}
+        table
+        {
+            border-collapse: collapse;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 36px;
+        }
+ 
+        table td, table th
+        {
+            border: 1px solid #cad9ea;
+        }
+ 
+        table th
+        {
+            width: 100px;
+        }
+ 
+ 
+    </style>
+</head>
+<body>
+	<table id="math_table">
+		<tr>
+			<th>NO.</th>
+			<th>First</th>
+			<th>Op</th>
+			<th>Second</th>
+			<th>Equal</th>
+			<th>Result</th>
+			<th>Check</th>
+		</tr>
+	</table>
+</body>
+</html>
+<script type="text/javascript">
+	var mathTable = document.getElementById("math_table")
+	for (var i = 1; i <= 10; i++) {
+		a=Math.round(Math.random()*190)+5
+		b=Math.round(Math.random()*170)+5
+		x=a
+		y=b
+
+		if (b>a){
+			x=b
+			y=a
+		}
+
+		if (i<=4){
+			op="+"
+		}else if(i<=7){
+			op="-"
+		}else if (i<=9){
+			x=Math.round(Math.random()*9)+2
+			y=Math.round(Math.random()*10)+2
+			op="*"
+		}else {
+			x=Math.round(Math.random()*9)+2
+			y=Math.round(Math.random()*9)+2
+
+			x=x*y
+
+			op="÷"
+		}
+		var data="<tr><td>"+ i +"</td> <td>"+ x +"</td> <td>"+ op +"</td> <td>"+ y +"</td> <td>=</td> <td></td> <td></td></tr>"
+		// document.createElement(data).appendTo(mathTable)
+		mathTable.innerHTML = mathTable.innerHTML + data
+	}
+</script>
