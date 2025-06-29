@@ -1423,47 +1423,120 @@
             container.appendChild(questionElement);
         }
 
-        // 生成错题解析
-        function generateExplanation(question, userAnswer, isCorrect) {
-            if (isCorrect) {
-                return '回答正确！';
+        // 智能答案判断函数
+        function isAnswerCorrect(userAnswer, correctAnswer, question) {
+            if (!userAnswer || userAnswer.trim() === '') {
+                return false;
             }
             
+            const userText = userAnswer.toLowerCase().trim();
+            const correctText = correctAnswer.toLowerCase().trim();
+            
+            // 完全匹配
+            if (userText === correctText) {
+                return true;
+            }
+            
+            // 基于题目类型的智能判断
+            if (question.type === 'vocabulary') {
+                if (question.question.includes('中文意思')) {
+                    // 英译中：检查是否包含关键词
+                    const keywords = correctText.split(/[，,、；;]/).map(k => k.trim()).filter(k => k.length > 0);
+                    return keywords.some(keyword => userText.includes(keyword));
+                } else {
+                    // 中译英：检查核心单词
+                    const coreWords = correctText.split(/\s+/);
+                    return coreWords.some(word => userText.includes(word));
+                }
+            } else if (question.type === 'grammar') {
+                if (question.question.includes('语法结构')) {
+                    // 语法识别：检查关键术语
+                    const grammarTerms = correctText.split(/[，,、；;]/).map(t => t.trim()).filter(t => t.length > 0);
+                    return grammarTerms.some(term => userText.includes(term));
+                } else {
+                    // 造句题：更宽松的判断，检查是否包含关键语法结构
+                    const item = question.originalItem;
+                    const grammarPattern = item.title.toLowerCase();
+                    
+                    // 检查是否包含语法结构的关键词
+                    if (grammarPattern.includes('present') && userText.match(/\b(am|is|are|do|does)\b/)) {
+                        return true;
+                    }
+                    if (grammarPattern.includes('past') && userText.match(/\b(was|were|did|ed\b)/)) {
+                        return true;
+                    }
+                    if (grammarPattern.includes('future') && userText.match(/\b(will|going to)\b/)) {
+                        return true;
+                    }
+                    if (grammarPattern.includes('question') && userText.match(/^(what|where|when|why|how|do|does|did|is|are|was|were)/)) {
+                        return true;
+                    }
+                    
+                    // 基本语法检查：至少包含主语和谓语
+                    const words = userText.split(/\s+/).filter(w => w.length > 0);
+                    return words.length >= 3; // 至少3个词构成基本句子
+                }
+            }
+            
+            return false;
+        }
+        
+        // 生成题目解析（包括正确和错误答案）
+        function generateExplanation(question, userAnswer, isCorrect) {
             const item = question.originalItem;
             let explanation = '';
             
+            // 用户答案部分
+            if (userAnswer && userAnswer !== '未作答') {
+                if (isCorrect) {
+                    explanation = `✅ 你的答案：「${userAnswer}」 - 回答正确！\n\n`;
+                } else {
+                    explanation = `❌ 你的答案：「${userAnswer}」\n\n`;
+                }
+            } else {
+                explanation = `⚠️ 你未作答此题。\n\n`;
+            }
+            
+            // 知识点解析
             if (question.type === 'vocabulary') {
                 if (question.question.includes('中文意思')) {
                     // 英译中题目
-                    explanation = `正确答案是「${question.correctAnswer}」。\n` +
-                                `单词「${item.word}」的含义：${item.explanation}\n` +
-                                `音标：${item.pronunciation}\n` +
-                                `词性：${item.category}`;
+                    explanation += `📖 知识点解析：\n` +
+                                 `正确答案：「${question.correctAnswer}」\n` +
+                                 `单词：${item.word}\n` +
+                                 `音标：${item.pronunciation}\n` +
+                                 `词性：${item.category}\n` +
+                                 `详细解释：${item.explanation}`;
                 } else {
                     // 中译英题目
-                    explanation = `正确答案是「${question.correctAnswer}」。\n` +
-                                `「${item.translation}」对应的英文单词是「${item.word}」\n` +
-                                `音标：${item.pronunciation}\n` +
-                                `记忆提示：${item.explanation}`;
+                    explanation += `📖 知识点解析：\n` +
+                                 `正确答案：「${question.correctAnswer}」\n` +
+                                 `中文含义：${item.translation}\n` +
+                                 `音标：${item.pronunciation}\n` +
+                                 `记忆提示：${item.explanation}`;
                 }
             } else if (question.type === 'grammar') {
                 if (question.question.includes('语法结构')) {
                     // 语法识别题目
-                    explanation = `正确答案是「${question.correctAnswer}」。\n` +
-                                `句子「${item.example}」使用的语法结构：${item.title}\n` +
-                                `语法说明：${item.explanation}`;
+                    explanation += `📖 知识点解析：\n` +
+                                 `正确答案：「${question.correctAnswer}」\n` +
+                                 `例句：${item.example}\n` +
+                                 `语法结构：${item.title}\n` +
+                                 `用法说明：${item.explanation}`;
                 } else {
                     // 造句题目
-                    explanation = `参考答案：「${question.correctAnswer}」\n` +
-                                `语法结构「${item.title}」的用法：${item.explanation}\n` +
-                                `标准例句：${item.example}`;
+                    explanation += `📖 知识点解析：\n` +
+                                 `参考答案：「${question.correctAnswer}」\n` +
+                                 `语法结构：${item.title}\n` +
+                                 `用法说明：${item.explanation}\n` +
+                                 `标准例句：${item.example}`;
+                    
+                    if (isCorrect) {
+                        explanation += `\n\n💡 你的句子符合语法要求，很棒！`;
+                    } else if (userAnswer && userAnswer !== '未作答') {
+                        explanation += `\n\n💡 建议：确保句子包含正确的语法结构，可以参考标准例句的格式。`;
+                    }
                 }
-            }
-            
-            if (userAnswer && userAnswer !== '未作答') {
-                explanation = `你的答案：「${userAnswer}」\n\n` + explanation;
-            } else {
-                explanation = `你未作答此题。\n\n` + explanation;
             }
             
             return explanation;
@@ -1477,7 +1550,7 @@
             
             testData.questions.forEach((question, index) => {
                 const userAnswer = testData.userAnswers[index];
-                const isCorrect = userAnswer && userAnswer.toLowerCase() === question.correctAnswer.toLowerCase();
+                const isCorrect = isAnswerCorrect(userAnswer, question.correctAnswer, question);
                 
                 if (isCorrect) {
                     correctCount++;
@@ -1492,7 +1565,7 @@
                     isCorrect: isCorrect,
                     type: question.type,
                     originalItem: question.originalItem,
-                    // 生成错题解析
+                    // 生成题目解析（包括正确和错误答案）
                     explanation: generateExplanation(question, userAnswer, isCorrect)
                 };
                 
