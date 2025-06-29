@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小学语文学习助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#DC2626',
+                        secondary: '#F59E0B',
+                        accent: '#059669',
+                        neutral: '#1F2937',
+                        'neutral-light': '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-flip {
+                perspective: 1000px;
+                transform-style: preserve-3d;
+            }
+            .card-front, .card-back {
+                backface-visibility: hidden;
+                transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .card-back {
+                transform: rotateY(180deg);
+            }
+            .card-flipped .card-front {
+                transform: rotateY(180deg);
+            }
+            .card-flipped .card-back {
+                transform: rotateY(0deg);
+            }
+            .progress-animation {
+                transition: width 1s ease-in-out;
+            }
+            .slide-in {
+                animation: slideIn 0.5s ease-out forwards;
+            }
+            @keyframes slideIn {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            .pulse {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            .poetry-text {
+                font-family: 'KaiTi', '楷体', serif;
+                line-height: 1.8;
+            }
+            .writing-text {
+                font-family: 'SimSun', '宋体', serif;
+                line-height: 1.6;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 to-orange-50 min-h-screen font-sans">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md fixed w-full z-50 transition-all duration-300" id="mainNav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0 flex items-center">
+                        <i class="fa fa-book text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-neutral">小学语文学习助手</span>
+                    </a>
+                    <div class="hidden sm:ml-6 sm:flex space-x-8">
+                        <a href="#poetry" class="border-primary text-primary border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium">
+                            <i class="fa fa-leaf mr-1"></i> 古诗词
+                        </a>
+                        <a href="#appreciation" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium">
+                            <i class="fa fa-eye mr-1"></i> 文章鉴赏
+                        </a>
+                        <a href="#writing-goals" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium">
+                            <i class="fa fa-target mr-1"></i> 写作目标
+                        </a>
+                        <a href="#writing-skills" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium">
+                            <i class="fa fa-pencil mr-1"></i> 写作技巧
+                        </a>
+                        <a href="#stats" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium">
+                            <i class="fa fa-bar-chart mr-1"></i> 学习统计
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="themeToggle" class="p-2 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <i class="fa fa-moon-o"></i>
+                    </button>
+                    <button type="button" class="ml-4 p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none sm:hidden" id="mobileMenuButton">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="sm:hidden hidden" id="mobileMenu">
+            <div class="px-2 pt-2 pb-3 space-y-1 bg-white shadow-lg">
+                <a href="#poetry" class="bg-primary/10 text-primary block pl-3 pr-4 py-2 border-l-4 border-primary text-base font-medium">
+                    <i class="fa fa-leaf mr-1"></i> 古诗词
+                </a>
+                <a href="#appreciation" class="border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium">
+                    <i class="fa fa-eye mr-1"></i> 文章鉴赏
+                </a>
+                <a href="#writing-goals" class="border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium">
+                    <i class="fa fa-target mr-1"></i> 写作目标
+                </a>
+                <a href="#writing-skills" class="border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium">
+                    <i class="fa fa-pencil mr-1"></i> 写作技巧
+                </a>
+                <a href="#stats" class="border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium">
+                    <i class="fa fa-bar-chart mr-1"></i> 学习统计
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <header class="pt-24 pb-12 md:pt-32 md:pb-20 bg-gradient-to-r from-primary to-secondary text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight mb-4">
+                    小学语文学习助手
+                </h1>
+                <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/80 max-w-3xl mx-auto mb-8">
+                    传承中华文化，品味诗词之美，提升写作能力，培养文学素养
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#poetry" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-all duration-300 transform hover:scale-105">
+                        <i class="fa fa-leaf mr-2"></i> 开始学习
+                    </a>
+                    <a href="#writing-skills" class="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-all duration-300 transform hover:scale-105">
+                        <i class="fa fa-pencil mr-2"></i> 写作练习
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- 古诗词部分 -->
+        <section id="poetry" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">
+                    <i class="fa fa-leaf text-primary mr-2"></i> 古诗词学习
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    品味经典古诗词，感受中华文化之美，通过卡片学习法深入理解诗词内涵
+                </p>
+            </div>
+
+            <!-- 古诗词筛选和控制 -->
+            <div class="mb-8 bg-white rounded-xl shadow-md p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-neutral mb-2">筛选古诗词</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="poetry-filter-btn px-4 py-2 rounded-full bg-primary text-white text-sm font-medium" data-filter="all">全部</button>
+                            <button class="poetry-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="一年级">一年级</button>
+                            <button class="poetry-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="二年级">二年级</button>
+                            <button class="poetry-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="三年级">三年级</button>
+                            <button class="poetry-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="四年级">四年级</button>
+                            <button class="poetry-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="五年级">五年级</button>
+                            <button class="poetry-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="已掌握">已掌握</button>
+                            <button class="poetry-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="未掌握">未掌握</button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="poetryShuffle" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
+                            <i class="fa fa-random mr-2"></i> 随机排序
+                        </button>
+                        <button id="poetryReset" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
+                            <i class="fa fa-refresh mr-2"></i> 重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 古诗词卡片网格 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="poetryCards">
+                <!-- 古诗词卡片将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 文章鉴赏部分 -->
+        <section id="appreciation" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">
+                    <i class="fa fa-eye text-primary mr-2"></i> 文章鉴赏
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    学习经典文章的鉴赏方法，提升文学理解能力和审美水平
+                </p>
+            </div>
+
+            <!-- 文章鉴赏内容 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="appreciationCards">
+                <!-- 文章鉴赏卡片将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 写作目标部分 -->
+        <section id="writing-goals" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">
+                    <i class="fa fa-target text-primary mr-2"></i> 写作目标
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    设定明确的写作目标，循序渐进提升写作能力
+                </p>
+            </div>
+
+            <!-- 写作目标内容 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="writingGoalsCards">
+                <!-- 写作目标卡片将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 写作技巧部分 -->
+        <section id="writing-skills" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">
+                    <i class="fa fa-pencil text-primary mr-2"></i> 写作技巧
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    掌握实用的写作技巧，让文章更加生动有趣
+                </p>
+            </div>
+
+            <!-- 写作技巧内容 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="writingSkillsCards">
+                <!-- 写作技巧卡片将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 学习统计部分 -->
+        <section id="stats" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">
+                    <i class="fa fa-bar-chart text-primary mr-2"></i> 学习统计
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    跟踪学习进度，了解学习成果，制定学习计划
+                </p>
+            </div>
+
+            <!-- 学习进度卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-neutral">古诗词学习</h3>
+                        <i class="fa fa-leaf text-primary text-2xl"></i>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>已掌握</span>
+                            <span id="poetryProgress">0/0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-primary h-2.5 rounded-full progress-animation" id="poetryProgressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-neutral">文章鉴赏</h3>
+                        <i class="fa fa-eye text-primary text-2xl"></i>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>已学习</span>
+                            <span id="appreciationProgress">0/0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-accent h-2.5 rounded-full progress-animation" id="appreciationProgressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-neutral">写作技巧</h3>
+                        <i class="fa fa-pencil text-primary text-2xl"></i>
+                    </div>
+                    <div class="mb-2">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span>已掌握</span>
+                            <span id="writingProgress">0/0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-secondary h-2.5 rounded-full progress-animation" id="writingProgressBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学习建议 -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-neutral mb-4">
+                    <i class="fa fa-lightbulb-o text-secondary mr-2"></i> 学习建议
+                </h3>
+                <div id="learningAdvice" class="text-gray-600">
+                    <!-- 学习建议将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-primary text-white p-3 rounded-full shadow-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-110 hidden z-40">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <!-- 古诗词详情模态框 -->
+    <div id="poetryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 id="modalTitle" class="text-xl font-bold text-neutral"></h3>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="modalContent" class="poetry-text">
+                    <!-- 古诗词内容将通过JavaScript动态生成 -->
+                </div>
+                <div class="mt-6 flex justify-between">
+                    <button id="toggleMastery" class="px-4 py-2 rounded-lg font-medium transition-colors">
+                        <!-- 按钮文本将通过JavaScript动态设置 -->
+                    </button>
+                    <button id="showAppreciation" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                        分析鉴赏
+                    </button>
+                </div>
+                <div id="appreciationContent" class="mt-4 hidden bg-gray-50 p-4 rounded-lg">
+                    <!-- 鉴赏内容将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 古诗词数据
+        const poetryData = {
+            "一年级上册": [
+                {
+                    title: "咏鹅",
+                    author: "唐·骆宾王",
+                    content: "鹅，鹅，鹅，\n曲项向天歌。\n白毛浮绿水，\n红掌拨清波。",
+                    appreciation: "这首诗通过对鹅的外形和动作的描写，展现了鹅的美丽和优雅。诗人用简洁的语言，生动地描绘了鹅在水中游泳的情景，表现了对自然的热爱。",
+                    grade: "一年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "江南",
+                    author: "汉乐府",
+                    content: "江南可采莲，\n莲叶何田田。\n鱼戏莲叶间。\n鱼戏莲叶东，\n鱼戏莲叶西，\n鱼戏莲叶南，\n鱼戏莲叶北。",
+                    appreciation: "这首民歌描绘了江南水乡采莲的美好景象，通过重复的句式表现了鱼儿在莲叶间嬉戏的活泼场面，充满了生活情趣。",
+                    grade: "一年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "画",
+                    author: "唐·王维",
+                    content: "远看山有色，\n近听水无声。\n春去花还在，\n人来鸟不惊。",
+                    appreciation: "这首诗通过对比的手法，描写了画中景物的特点，表现了画的逼真和艺术魅力，体现了诗人对艺术的赞美。",
+                    grade: "一年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "悯农（其二）",
+                    author: "唐·李绅",
+                    content: "锄禾日当午，\n汗滴禾下土。\n谁知盘中餐，\n粒粒皆辛苦。",
+                    appreciation: "这首诗描写了农民在烈日下辛勤劳作的情景，告诉我们要珍惜粮食，体现了对劳动人民的同情和对劳动的尊重。",
+                    grade: "一年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "古朗月行（节选）",
+                    author: "唐·李白",
+                    content: "小时不识月，\n呼作白玉盘。\n又疑瑶台镜，\n飞在青云端。",
+                    appreciation: "这首诗通过儿童的视角描写月亮，用比喻的手法将月亮比作白玉盘和瑶台镜，表现了儿童的天真烂漫和丰富的想象力。",
+                    grade: "一年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "风",
+                    author: "唐·李峤",
+                    content: "解落三秋叶，\n能开二月花。\n过江千尺浪，\n入竹万竿斜。",
+                    appreciation: "这首诗通过描写风的作用，展现了风的力量和变化，用对比的手法表现了风在不同季节、不同环境中的不同表现。",
+                    grade: "一年级",
+                    semester: "上册",
+                    mastered: false
+                }
+            ],
+            "一年级下册": [
+                {
+                    title: "春晓",
+                    author: "唐·孟浩然",
+                    content: "春眠不觉晓，\n处处闻啼鸟。\n夜来风雨声，\n花落知多少。",
+                    appreciation: "这首诗描写了春天早晨的美好景象，通过听觉感受表现了春天的生机勃勃，体现了诗人对春天的喜爱和对自然的敏感。",
+                    grade: "一年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "赠汪伦",
+                    author: "唐·李白",
+                    content: "李白乘舟将欲行，\n忽闻岸上踏歌声。\n桃花潭水深千尺，\n不及汪伦送我情。",
+                    appreciation: "这首诗表达了诗人与朋友汪伦的深厚友谊，用夸张的手法将桃花潭水与友情相比，突出了友谊的珍贵。",
+                    grade: "一年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "静夜思",
+                    author: "唐·李白",
+                    content: "床前明月光，\n疑是地上霜。\n举头望明月，\n低头思故乡。",
+                    appreciation: "这首诗表达了诗人在异乡的思乡之情，通过月光引起的联想，表现了游子对故乡的深深眷恋。",
+                    grade: "一年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "寻隐者不遇",
+                    author: "唐·贾岛",
+                    content: "松下问童子，\n言师采药去。\n只在此山中，\n云深不知处。",
+                    appreciation: "这首诗通过对话的形式，描写了寻访隐者而不遇的情景，表现了隐者的高洁品格和山中的幽深环境。",
+                    grade: "一年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "池上",
+                    author: "唐·白居易",
+                    content: "小娃撑小艇，\n偷采白莲回。\n不解藏踪迹，\n浮萍一道开。",
+                    appreciation: "这首诗描写了儿童偷采莲花的天真情景，通过细节描写表现了儿童的可爱和纯真，充满了生活情趣。",
+                    grade: "一年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "小池",
+                    author: "宋·杨万里",
+                    content: "泉眼无声惜细流，\n树阴照水爱晴柔。\n小荷才露尖尖角，\n早有蜻蜓立上头。",
+                    appreciation: "这首诗描写了初夏小池的美丽景象，通过拟人的手法表现了自然的和谐美好，体现了诗人对自然的细致观察。",
+                    grade: "一年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "画鸡",
+                    author: "明·唐寅",
+                    content: "头上红冠不用裁，\n满身雪白走将来。\n平生不敢轻言语，\n一叫千门万户开。",
+                    appreciation: "这首诗通过对公鸡外形和叫声的描写，赞美了公鸡的威武和作用，体现了诗人对勤劳品质的赞美。",
+                    grade: "一年级",
+                    semester: "下册",
+                    mastered: false
+                }
+            ],
+            "二年级上册": [
+                {
+                    title: "梅花",
+                    author: "宋·王安石",
+                    content: "墙角数枝梅，\n凌寒独自开。\n遥知不是雪，\n为有暗香来。",
+                    appreciation: "这首诗赞美了梅花不畏严寒、独自开放的品格，通过对比的手法突出了梅花的坚强和香气的独特。",
+                    grade: "二年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "小儿垂钓",
+                    author: "唐·胡令能",
+                    content: "蓬头稚子学垂纶，\n侧坐莓苔草映身。\n路人借问遥招手，\n怕得鱼惊不应人。",
+                    appreciation: "这首诗描写了儿童学钓鱼的专注神态，通过细节描写表现了儿童的天真可爱和认真专注的品质。",
+                    grade: "二年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "登鹳雀楼",
+                    author: "唐·王之涣",
+                    content: "白日依山尽，\n黄河入海流。\n欲穷千里目，\n更上一层楼。",
+                    appreciation: "这首诗通过登楼远望的描写，表达了诗人积极向上的人生态度和不断进取的精神追求。",
+                    grade: "二年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "望庐山瀑布",
+                    author: "唐·李白",
+                    content: "日照香炉生紫烟，\n遥看瀑布挂前川。\n飞流直下三千尺，\n疑是银河落九天。",
+                    appreciation: "这首诗通过夸张的手法描写了庐山瀑布的壮观景象，表现了大自然的雄伟和诗人的豪迈情怀。",
+                    grade: "二年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "江雪",
+                    author: "唐·柳宗元",
+                    content: "千山鸟飞绝，\n万径人踪灭。\n孤舟蓑笠翁，\n独钓寒江雪。",
+                    appreciation: "这首诗通过对比的手法，描写了雪后江上的寂静景象和渔翁独钓的情景，表现了坚韧不拔的品格。",
+                    grade: "二年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "夜宿山寺",
+                    author: "唐·李白",
+                    content: "危楼高百尺，\n手可摘星辰。\n不敢高声语，\n恐惊天上人。",
+                    appreciation: "这首诗通过夸张的手法描写了山寺的高耸，表现了诗人对高山寺庙的敬畏和对自然的赞美。",
+                    grade: "二年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "敕勒歌",
+                    author: "北朝民歌",
+                    content: "敕勒川，阴山下。\n天似穹庐，笼盖四野。\n天苍苍，野茫茫，\n风吹草低见牛羊。",
+                    appreciation: "这首民歌描绘了北方草原的辽阔景象，通过比喻的手法表现了草原的壮美和牧民生活的自由。",
+                    grade: "二年级",
+                    semester: "上册",
+                    mastered: false
+                }
+            ],
+            "二年级下册": [
+                {
+                    title: "村居",
+                    author: "清·高鼎",
+                    content: "草长莺飞二月天，\n拂堤杨柳醉春烟。\n儿童散学归来早，\n忙趁东风放纸鸢。",
+                    appreciation: "这首诗描写了春天乡村的美好景象和儿童放风筝的快乐情景，表现了春天的生机勃勃和童年的美好。",
+                    grade: "二年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "咏柳",
+                    author: "唐·贺知章",
+                    content: "碧玉妆成一树高，\n万条垂下绿丝绦。\n不知细叶谁裁出，\n二月春风似剪刀。",
+                    appreciation: "这首诗通过比喻的手法赞美了柳树的美丽，将春风比作剪刀，表现了春天的神奇力量和自然的美好。",
+                    grade: "二年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "赋得古原草送别（节选）",
+                    author: "唐·白居易",
+                    content: "离离原上草，\n一岁一枯荣。\n野火烧不尽，\n春风吹又生。",
+                    appreciation: "这首诗通过对草的描写，表现了生命力的顽强和不屈不挠的精神，体现了自然界的生生不息。",
+                    grade: "二年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "晓出净慈寺送林子方",
+                    author: "宋·杨万里",
+                    content: "毕竟西湖六月中，\n风光不与四时同。\n接天莲叶无穷碧，\n映日荷花别样红。",
+                    appreciation: "这首诗描写了西湖夏日的美丽景色，通过对比的手法突出了夏日荷花的独特美丽。",
+                    grade: "二年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "绝句",
+                    author: "唐·杜甫",
+                    content: "两个黄鹂鸣翠柳，\n一行白鹭上青天。\n窗含西岭千秋雪，\n门泊东吴万里船。",
+                    appreciation: "这首诗通过对春天景色的描写，表现了自然的和谐美好和诗人愉悦的心情。",
+                    grade: "二年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "悯农（其一）",
+                    author: "唐·李绅",
+                    content: "春种一粒粟，\n秋收万颗子。\n四海无闲田，\n农夫犹饿死。",
+                    appreciation: "这首诗反映了农民的辛苦劳作和社会的不公，表达了诗人对农民的同情和对社会现实的关注。",
+                    grade: "二年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "舟夜书所见",
+                    author: "清·查慎行",
+                    content: "月黑见渔灯，\n孤光一点萤。\n微微风簇浪，\n散作满河星。",
+                    appreciation: "这首诗描写了夜晚江上的美丽景象，通过比喻的手法将波光比作星星，表现了夜景的诗意美。",
+                    grade: "二年级",
+                    semester: "下册",
+                    mastered: false
+                }
+            ],
+            "三年级上册": [
+                {
+                    title: "所见",
+                    author: "清·袁枚",
+                    content: "牧童骑黄牛，\n歌声振林樾。\n意欲捕鸣蝉，\n忽然闭口立。",
+                    appreciation: "这首诗描写了牧童捕蝉的有趣情景，通过动作描写表现了儿童的天真活泼和机灵可爱。",
+                    grade: "三年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "山行",
+                    author: "唐·杜牧",
+                    content: "远上寒山石径斜，\n白云深处有人家。\n停车坐爱枫林晚，\n霜叶红于二月花。",
+                    appreciation: "这首诗描写了秋天山中的美丽景色，通过对比的手法突出了枫叶的美丽，表现了诗人对自然美的热爱。",
+                    grade: "三年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "赠刘景文",
+                    author: "宋·苏轼",
+                    content: "荷尽已无擎雨盖，\n菊残犹有傲霜枝。\n一年好景君须记，\n最是橙黄橘绿时。",
+                    appreciation: "这首诗通过对秋景的描写，表达了对朋友的勉励，告诉我们要珍惜美好时光，保持乐观向上的态度。",
+                    grade: "三年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "夜书所见",
+                    author: "宋·叶绍翁",
+                    content: "萧萧梧叶送寒声，\n江上秋风动客情。\n知有儿童挑促织，\n夜深篱落一灯明。",
+                    appreciation: "这首诗通过对秋夜景象的描写，表达了诗人的思乡之情和对童年生活的怀念。",
+                    grade: "三年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "望天门山",
+                    author: "唐·李白",
+                    content: "天门中断楚江开，\n碧水东流至此回。\n两岸青山相对出，\n孤帆一片日边来。",
+                    appreciation: "这首诗描写了天门山的雄伟景象，通过拟人的手法表现了山水的动态美和诗人的豪迈情怀。",
+                    grade: "三年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "饮湖上初晴后雨",
+                    author: "宋·苏轼",
+                    content: "水光潋滟晴方好，\n山色空蒙雨亦奇。\n欲把西湖比西子，\n淡妆浓抹总相宜。",
+                    appreciation: "这首诗通过对西湖不同天气下美景的描写，用比喻的手法将西湖比作美女西施，赞美了西湖的美丽。",
+                    grade: "三年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "望洞庭",
+                    author: "唐·刘禹锡",
+                    content: "湖光秋月两相和，\n潭面无风镜未磨。\n遥望洞庭山水翠，\n白银盘里一青螺。",
+                    appreciation: "这首诗通过比喻的手法描写了洞庭湖的美丽景色，将湖面比作镜子，将君山比作青螺，形象生动。",
+                    grade: "三年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "早发白帝城",
+                    author: "唐·李白",
+                    content: "朝辞白帝彩云间，\n千里江陵一日还。\n两岸猿声啼不住，\n轻舟已过万重山。",
+                    appreciation: "这首诗表达了诗人愉快的心情和对自由的向往，通过夸张的手法表现了船行的快速和心情的轻松。",
+                    grade: "三年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "采莲曲",
+                    author: "唐·王昌龄",
+                    content: "荷叶罗裙一色裁，\n芙蓉向脸两边开。\n乱入池中看不见，\n闻歌始觉有人来。",
+                    appreciation: "这首诗描写了采莲女的美丽和采莲的情景，通过对比的手法表现了人与自然的和谐统一。",
+                    grade: "三年级",
+                    semester: "上册",
+                    mastered: false
+                }
+            ],
+            "三年级下册": [
+                {
+                    title: "绝句",
+                    author: "唐·杜甫",
+                    content: "迟日江山丽，\n春风花草香。\n泥融飞燕子，\n沙暖睡鸳鸯。",
+                    appreciation: "这首诗描写了春天的美好景象，通过对自然景物的细致观察，表现了春天的温暖和生机。",
+                    grade: "三年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "惠崇春江晚景",
+                    author: "宋·苏轼",
+                    content: "竹外桃花三两枝，\n春江水暖鸭先知。\n蒌蒿满地芦芽短，\n正是河豚欲上时。",
+                    appreciation: "这首诗通过对春江景色的描写，表现了春天的到来和万物复苏的景象，体现了诗人敏锐的观察力。",
+                    grade: "三年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "三衢道中",
+                    author: "宋·曾几",
+                    content: "梅子黄时日日晴，\n小溪泛尽却山行。\n绿阴不减来时路，\n添得黄鹂四五声。",
+                    appreciation: "这首诗描写了初夏山行的愉快经历，通过对景色变化的描写，表现了旅途的美好和心情的愉悦。",
+                    grade: "三年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "忆江南",
+                    author: "唐·白居易",
+                    content: "江南好，\n风景旧曾谙。\n日出江花红胜火，\n春来江水绿如蓝。\n能不忆江南？",
+                    appreciation: "这首词通过对江南美景的回忆，表达了诗人对江南的深深眷恋和思念之情。",
+                    grade: "三年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "元日",
+                    author: "宋·王安石",
+                    content: "爆竹声中一岁除，\n春风送暖入屠苏。\n千门万户曈曈日，\n总把新桃换旧符。",
+                    appreciation: "这首诗描写了春节的热闹景象和人们迎接新年的喜悦心情，表现了传统节日的文化内涵。",
+                    grade: "三年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "清明",
+                    author: "唐·杜牧",
+                    content: "清明时节雨纷纷，\n路上行人欲断魂。\n借问酒家何处有？\n牧童遥指杏花村。",
+                    appreciation: "这首诗通过对清明时节景象的描写，表现了行人的愁绪和对温暖的渴望，情景交融。",
+                    grade: "三年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "九月九日忆山东兄弟",
+                    author: "唐·王维",
+                    content: "独在异乡为异客，\n每逢佳节倍思亲。\n遥知兄弟登高处，\n遍插茱萸少一人。",
+                    appreciation: "这首诗表达了诗人在异乡的思亲之情，通过对重阳节习俗的描写，突出了思念的深切。",
+                    grade: "三年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "滁州西涧",
+                    author: "唐·韦应物",
+                    content: "独怜幽草涧边生，\n上有黄鹂深树鸣。\n春潮带雨晚来急，\n野渡无人舟自横。",
+                    appreciation: "这首诗通过对山涧景色的描写，表现了自然的幽静美好和诗人的恬淡心境。",
+                    grade: "三年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "大林寺桃花",
+                    author: "唐·白居易",
+                    content: "人间四月芳菲尽，\n山寺桃花始盛开。\n长恨春归无觅处，\n不知转入此中来。",
+                    appreciation: "这首诗通过对山寺桃花的描写，表现了不同地方季节变化的差异，体现了诗人的惊喜和发现。",
+                    grade: "三年级",
+                    semester: "下册",
+                    mastered: false
+                }
+            ],
+            "四年级上册": [
+                {
+                    title: "暮江吟",
+                    author: "唐·白居易",
+                    content: "一道残阳铺水中，\n半江瑟瑟半江红。\n可怜九月初三夜，\n露似真珠月似弓。",
+                    appreciation: "这首诗描写了江上黄昏和夜晚的美丽景色，通过对比和比喻的手法，表现了自然景色的变化之美。",
+                    grade: "四年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "题西林壁",
+                    author: "宋·苏轼",
+                    content: "横看成岭侧成峰，\n远近高低各不同。\n不识庐山真面目，\n只缘身在此山中。",
+                    appreciation: "这首诗通过对庐山不同角度观察的描写，说明了观察事物要全面客观的道理，富有哲理性。",
+                    grade: "四年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "雪梅",
+                    author: "宋·卢钺",
+                    content: "梅雪争春未肯降，\n骚人搁笔费评章。\n梅须逊雪三分白，\n雪却输梅一段香。",
+                    appreciation: "这首诗通过梅花和雪花的对比，说明了各有所长、各有特色的道理，体现了辩证的思维。",
+                    grade: "四年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "出塞",
+                    author: "唐·王昌龄",
+                    content: "秦时明月汉时关，\n万里长征人未还。\n但使龙城飞将在，\n不教胡马度阴山。",
+                    appreciation: "这首诗表达了对战争的厌恶和对和平的渴望，通过对历史的回顾，表现了保家卫国的决心。",
+                    grade: "四年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "凉州词",
+                    author: "唐·王翰",
+                    content: "葡萄美酒夜光杯，\n欲饮琵琶马上催。\n醉卧沙场君莫笑，\n古来征战几人回。",
+                    appreciation: "这首诗表现了边塞将士的豪迈情怀和对战争残酷的感慨，体现了悲壮的美感。",
+                    grade: "四年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "夏日绝句",
+                    author: "宋·李清照",
+                    content: "生当作人杰，\n死亦为鬼雄。\n至今思项羽，\n不肯过江东。",
+                    appreciation: "这首诗表达了对英雄气概的赞美和对懦弱行为的批评，体现了诗人的爱国情怀和刚烈性格。",
+                    grade: "四年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "鹿柴",
+                    author: "唐·王维",
+                    content: "空山不见人，\n但闻人语响。\n返景入深林，\n复照青苔上。",
+                    appreciation: "这首诗通过对山林幽静环境的描写，表现了自然的神秘美好和诗人内心的宁静。",
+                    grade: "四年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "嫦娥",
+                    author: "唐·李商隐",
+                    content: "云母屏风烛影深，\n长河渐落晓星沉。\n嫦娥应悔偷灵药，\n碧海青天夜夜心。",
+                    appreciation: "这首诗通过嫦娥的传说，表达了孤独和思念的情感，体现了诗人对美好情感的向往。",
+                    grade: "四年级",
+                    semester: "上册",
+                    mastered: false
+                }
+            ],
+            "四年级下册": [
+                {
+                    title: "四时田园杂兴（其二十五）",
+                    author: "宋·范成大",
+                    content: "梅子金黄杏子肥，\n麦花雪白菜花稀。\n日长篱落无人过，\n惟有蜻蜓蛱蝶飞。",
+                    appreciation: "这首诗描写了初夏田园的美丽景色，通过对农村生活的细致观察，表现了田园生活的宁静美好。",
+                    grade: "四年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "宿新市徐公店",
+                    author: "宋·杨万里",
+                    content: "篱落疏疏一径深，\n树头花落未成阴。\n儿童急走追黄蝶，\n飞入菜花无处寻。",
+                    appreciation: "这首诗描写了儿童追蝶的有趣情景，表现了童年生活的天真烂漫和乡村春天的美好。",
+                    grade: "四年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "清平乐·村居",
+                    author: "宋·辛弃疾",
+                    content: "茅檐低小，溪上青青草。\n醉里吴音相媚好，白发谁家翁媪？\n大儿锄豆溪东，中儿正织鸡笼。\n最喜小儿亡赖，溪头卧剥莲蓬。",
+                    appreciation: "这首词描写了农村家庭的和睦生活，表现了诗人对田园生活的向往和对家庭温馨的赞美。",
+                    grade: "四年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "芙蓉楼送辛渐",
+                    author: "唐·王昌龄",
+                    content: "寒雨连江夜入吴，\n平明送客楚山孤。\n洛阳亲友如相问，\n一片冰心在玉壶。",
+                    appreciation: "这首诗通过送别场景的描写，表达了诗人高洁的品格和对友谊的珍视。",
+                    grade: "四年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "塞下曲",
+                    author: "唐·卢纶",
+                    content: "月黑雁飞高，\n单于夜遁逃。\n欲将轻骑逐，\n大雪满弓刀。",
+                    appreciation: "这首诗描写了边塞战争的紧张场面，表现了将士们的英勇和边塞生活的艰苦。",
+                    grade: "四年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "墨梅",
+                    author: "元·王冕",
+                    content: "我家洗砚池头树，\n朵朵花开淡墨痕。\n不要人夸好颜色，\n只留清气满乾坤。",
+                    appreciation: "这首诗通过咏梅表达了诗人不求虚名、只求品格高洁的人生态度。",
+                    grade: "四年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "蜂",
+                    author: "唐·罗隐",
+                    content: "不论平地与山尖，\n无限风光尽被占。\n采得百花成蜜后，\n为谁辛苦为谁甜？",
+                    appreciation: "这首诗通过对蜜蜂的描写，赞美了劳动者的辛勤付出，也含有对社会不公的思考。",
+                    grade: "四年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "独坐敬亭山",
+                    author: "唐·李白",
+                    content: "众鸟高飞尽，\n孤云独去闲。\n相看两不厌，\n只有敬亭山。",
+                    appreciation: "这首诗表达了诗人的孤独心境，通过与敬亭山的对话，体现了诗人对自然的深情。",
+                    grade: "四年级",
+                    semester: "下册",
+                    mastered: false
+                }
+            ],
+            "五年级上册": [
+                {
+                    title: "示儿",
+                    author: "宋·陆游",
+                    content: "死去元知万事空，\n但悲不见九州同。\n王师北定中原日，\n家祭无忘告乃翁。",
+                    appreciation: "这是陆游的绝笔诗，表达了诗人至死不忘收复失地的爱国情怀，体现了强烈的民族精神。",
+                    grade: "五年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "题临安邸",
+                    author: "宋·林升",
+                    content: "山外青山楼外楼，\n西湖歌舞几时休？\n暖风熏得游人醉，\n直把杭州作汴州。",
+                    appreciation: "这首诗通过对南宋统治者沉迷享乐的批评，表达了诗人对国家命运的忧虑和对统治者的讽刺。",
+                    grade: "五年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "己亥杂诗",
+                    author: "清·龚自珍",
+                    content: "九州生气恃风雷，\n万马齐喑究可哀。\n我劝天公重抖擞，\n不拘一格降人才。",
+                    appreciation: "这首诗表达了诗人对社会变革的渴望和对人才的重视，体现了强烈的社会责任感。",
+                    grade: "五年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "山居秋暝",
+                    author: "唐·王维",
+                    content: "空山新雨后，\n天气晚来秋。\n明月松间照，\n清泉石上流。\n竹喧归浣女，\n莲动下渔舟。\n随意春芳歇，\n王孙自可留。",
+                    appreciation: "这首诗描写了山中秋日雨后的清新景色，表现了诗人对自然美景的热爱和隐居生活的向往。",
+                    grade: "五年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "枫桥夜泊",
+                    author: "唐·张继",
+                    content: "月落乌啼霜满天，\n江枫渔火对愁眠。\n姑苏城外寒山寺，\n夜半钟声到客船。",
+                    appreciation: "这首诗通过夜泊枫桥的所见所闻，表达了游子的思乡之情和旅途的孤独感受。",
+                    grade: "五年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "长相思",
+                    author: "清·纳兰性德",
+                    content: "山一程，水一程，\n身向榆关那畔行，\n夜深千帐灯。\n风一更，雪一更，\n聒碎乡心梦不成，\n故园无此声。",
+                    appreciation: "这首词通过对行军途中艰苦环境的描写，表达了作者对故乡的深切思念之情。",
+                    grade: "五年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "渔歌子",
+                    author: "唐·张志和",
+                    content: "西塞山前白鹭飞，\n桃花流水鳜鱼肥。\n青箬笠，绿蓑衣，\n斜风细雨不须归。",
+                    appreciation: "这首词描写了江南水乡春天的美丽景色，表现了渔翁悠然自得的生活情趣。",
+                    grade: "五年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "观书有感（其一）",
+                    author: "宋·朱熹",
+                    content: "半亩方塘一鉴开，\n天光云影共徘徊。\n问渠那得清如许？\n为有源头活水来。",
+                    appreciation: "这首诗通过对池塘清水的描写，比喻读书学习的重要性，强调了不断学习的必要性。",
+                    grade: "五年级",
+                    semester: "上册",
+                    mastered: false
+                },
+                {
+                    title: "观书有感（其二）",
+                    author: "宋·朱熹",
+                    content: "昨夜江边春水生，\n艨艟巨舰一毛轻。\n向来枉费推移力，\n此日中流自在行。",
+                    appreciation: "这首诗通过船只在春水中轻松航行的比喻，说明了学习达到一定程度后的豁然开朗。",
+                    grade: "五年级",
+                    semester: "上册",
+                    mastered: false
+                }
+            ],
+            "五年级下册": [
+                {
+                    title: "四时田园杂兴（其三十一）",
+                    author: "宋·范成大",
+                    content: "昼出耘田夜绩麻，\n村庄儿女各当家。\n童孙未解供耕织，\n也傍桑阴学种瓜。",
+                    appreciation: "这首诗描写了农村家庭的劳动生活，表现了农民的勤劳和儿童学习劳动的天真可爱。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "稚子弄冰",
+                    author: "宋·杨万里",
+                    content: "稚子金盆脱晓冰，\n彩丝穿取当银钲。\n敲成玉磬穿林响，\n忽作玻璃碎地声。",
+                    appreciation: "这首诗描写了儿童玩冰的有趣情景，表现了童年生活的天真烂漫和纯真快乐。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "村晚",
+                    author: "宋·雷震",
+                    content: "草满池塘水满陂，\n山衔落日浸寒漪。\n牧童归去横牛背，\n短笛无腔信口吹。",
+                    appreciation: "这首诗描写了乡村黄昏的宁静美景，表现了田园生活的悠闲和牧童的天真快乐。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "游子吟",
+                    author: "唐·孟郊",
+                    content: "慈母手中线，\n游子身上衣。\n临行密密缝，\n意恐迟迟归。\n谁言寸草心，\n报得三春晖。",
+                    appreciation: "这首诗通过对母亲为游子缝衣的细节描写，表达了母爱的伟大和子女对母亲的感恩之情。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "鸟鸣涧",
+                    author: "唐·王维",
+                    content: "人闲桂花落，\n夜静春山空。\n月出惊山鸟，\n时鸣春涧中。",
+                    appreciation: "这首诗通过对春夜山涧的描写，表现了自然的宁静美好和诗人内心的平和。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "从军行",
+                    author: "唐·王昌龄",
+                    content: "青海长云暗雪山，\n孤城遥望玉门关。\n黄沙百战穿金甲，\n不破楼兰终不还。",
+                    appreciation: "这首诗描写了边塞将士的豪迈气概，表现了保家卫国的坚定决心和英勇精神。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "秋夜将晓出篱门迎凉有感",
+                    author: "宋·陆游",
+                    content: "三万里河东入海，\n五千仞岳上摩天。\n遗民泪尽胡尘里，\n南望王师又一年。",
+                    appreciation: "这首诗表达了诗人对祖国山河的热爱和对收复失地的渴望，体现了深沉的爱国情怀。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "闻官军收河南河北",
+                    author: "唐·杜甫",
+                    content: "剑外忽传收蓟北，\n初闻涕泪满衣裳。\n却看妻子愁何在，\n漫卷诗书喜欲狂。\n白日放歌须纵酒，\n青春作伴好还乡。\n即从巴峡穿巫峡，\n便下襄阳向洛阳。",
+                    appreciation: "这首诗表达了诗人听到官军收复失地的喜悦心情，体现了对和平的渴望和回乡的急切。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "凉州词",
+                    author: "唐·王之涣",
+                    content: "黄河远上白云间，\n一片孤城万仞山。\n羌笛何须怨杨柳，\n春风不度玉门关。",
+                    appreciation: "这首诗描写了边塞的壮丽景色和戍边将士的思乡之情，表现了边塞生活的艰苦。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "黄鹤楼送孟浩然之广陵",
+                    author: "唐·李白",
+                    content: "故人西辞黄鹤楼，\n烟花三月下扬州。\n孤帆远影碧空尽，\n唯见长江天际流。",
+                    appreciation: "这首诗通过送别场景的描写，表达了诗人对友人的深情厚谊和离别的不舍之情。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                },
+                {
+                    title: "乡村四月",
+                    author: "宋·翁卷",
+                    content: "绿遍山原白满川，\n子规声里雨如烟。\n乡村四月闲人少，\n才了蚕桑又插田。",
+                    appreciation: "这首诗描写了江南农村四月的繁忙景象，表现了农民的勤劳和乡村生活的美好。",
+                    grade: "五年级",
+                    semester: "下册",
+                    mastered: false
+                }
+            ]
+        };
+
+        // 文章鉴赏数据
+        const articles = [
+            {
+                title: "春天的故事",
+                author: "现代作家",
+                content: "春天来了，万物复苏...",
+                appreciation: "这篇文章通过对春天景色的描写，表达了对生命力的赞美。",
+                type: "写景",
+                learned: false
+            },
+            {
+                title: "我的老师",
+                author: "现代作家",
+                content: "我的老师是一位和蔼可亲的人...",
+                appreciation: "这篇文章通过具体事例展现了老师的品格，表达了对老师的敬爱之情。",
+                type: "写人",
+                learned: false
+            }
+        ];
+
+        // 写作目标数据
+        const writingGoals = [
+            {
+                grade: "四年级",
+                goals: [
+                    "写作目的：乐于表达，增强自信",
+                    "内容要求：把新奇有趣或受感动的内容写清楚",
+                    "结构要求：语句连贯，段落初步形成",
+                    "文体范围：不拘形式写见闻感受，简短书信便条",
+                    "修改能力：修改有明显错误的词句"
+                ]
+            },
+            {
+                grade: "五年级",
+                goals: [
+                    "写作目的：懂得为自我表达和与人交流而写作",
+                    "内容要求：内容具体，感情真实，珍视独特感受",
+                    "结构要求：能根据表达需要分段表述",
+                    "文体范围：记实作文、想象作文、读书笔记、常见应用文",
+                    "修改能力：主动与他人交换修改，关注整体质量"
+                ]
+            }
+        ];
+
+        // 写作技巧数据
+        const writingTips = [
+            {
+                category: "细节描写",
+                tips: [
+                    "核心要求：运用动作、语言、神态等描写使人物立体",
+                    "训练方法：'慢镜头写作法'——将一个动作分解成多个步骤描写",
+                    "实践技巧：观察人物的微表情和小动作，让描写更生动"
+                ]
+            },
+            {
+                category: "环境描写",
+                tips: [
+                    "核心要求：多感官结合（视觉+听觉+触觉）",
+                    "训练方法：'五觉训练'——观察雨景时记录形状、声音、触感",
+                    "实践技巧：用比喻和拟人让环境描写更有画面感"
+                ]
+            },
+            {
+                category: "结构布局",
+                tips: [
+                    "核心要求：开头点题、中间具体、结尾感悟",
+                    "训练方法：'汉堡包写作法'——用导图规划开头1句+中间3段+结尾1句",
+                    "实践技巧：学会使用过渡句连接段落，让文章更流畅"
+                ]
+            },
+            {
+                category: "语言表达",
+                tips: [
+                    "核心要求：避免重复用词，使用新鲜表达",
+                    "训练方法：'词语升级游戏'——将'开心'替换为'嘴角不自觉上扬'",
+                    "实践技巧：积累好词好句，学会运用修辞手法"
+                ]
+            },
+            {
+                category: "想象能力",
+                tips: [
+                    "核心要求：基于现实的合理想象",
+                    "训练方法：看图联想训练——给气球图片添加动态和语言描写",
+                    "实践技巧：从生活中的小事出发，展开合理的想象"
+                ]
+            }
+        ];
+
+        // 页面初始化
+        function initializePage() {
+            initNavigation();
+            initPoemsSection();
+            initArticlesSection();
+            initWritingGoalsSection();
+            initWritingTipsSection();
+            initStatistics();
+            initBackToTop();
+            initThemeToggle();
+        }
+
+        // 初始化导航功能
+        function initNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mobileMenu = document.querySelector('.mobile-menu');
+
+            // 导航链接点击事件
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    
+                    if (targetSection) {
+                        // 隐藏所有section
+                        sections.forEach(section => {
+                            section.style.display = 'none';
+                        });
+                        
+                        // 显示目标section
+                        targetSection.style.display = 'block';
+                        
+                        // 更新导航状态
+                        navLinks.forEach(navLink => {
+                            navLink.classList.remove('active');
+                        });
+                        link.classList.add('active');
+                        
+                        // 关闭移动端菜单
+                        if (mobileMenu) {
+                            mobileMenu.classList.remove('active');
+                        }
+                    }
+                });
+            });
+
+            // 移动端菜单切换
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('active');
+                });
+            }
+
+            // 默认显示古诗词section
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById('poetry').style.display = 'block';
+        }
+
+        // 初始化古诗词模块
+        function initPoemsSection() {
+            renderPoems();
+            
+            // 筛选功能
+            const filterBtns = document.querySelectorAll('.poetry-filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 更新按钮状态
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    this.classList.remove('bg-gray-100', 'text-gray-700');
+                    this.classList.add('bg-primary', 'text-white');
+                    
+                    // 应用筛选
+                    const filter = this.getAttribute('data-filter');
+                    renderPoems(filter);
+                });
+            });
+            
+            // 随机排序和重置功能
+            const shuffleBtn = document.getElementById('poetryShuffle');
+            const resetBtn = document.getElementById('poetryReset');
+            
+            if (shuffleBtn) {
+                shuffleBtn.addEventListener('click', () => {
+                    renderPoems('all', true);
+                });
+            }
+            
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    // 重置筛选按钮
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    filterBtns[0].classList.remove('bg-gray-100', 'text-gray-700');
+                    filterBtns[0].classList.add('bg-primary', 'text-white');
+                    
+                    renderPoems('all');
+                });
+            }
+        }
+
+        // 渲染古诗词卡片
+        function renderPoems(filter = 'all', shuffle = false) {
+            const container = document.getElementById('poetryCards');
+            if (!container) return;
+            
+            let filteredPoems = [];
+            
+            // 收集所有诗词
+            Object.entries(poetryData).forEach(([key, poemList]) => {
+                filteredPoems.push(...poemList);
+            });
+            
+            // 应用筛选
+            if (filter !== 'all') {
+                if (filter === '已掌握') {
+                    filteredPoems = filteredPoems.filter(poem => poem.mastered);
+                } else if (filter === '未掌握') {
+                    filteredPoems = filteredPoems.filter(poem => !poem.mastered);
+                } else {
+                    filteredPoems = filteredPoems.filter(poem => poem.grade === filter);
+                }
+            }
+            
+            // 随机排序
+            if (shuffle) {
+                filteredPoems = filteredPoems.sort(() => Math.random() - 0.5);
+            }
+            
+            container.innerHTML = filteredPoems.map((poem, index) => `
+                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-bold text-neutral">${poem.title}</h3>
+                            <span class="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">${poem.grade} ${poem.semester}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">${poem.author}</p>
+                        <div class="text-sm text-gray-700 mb-6 leading-relaxed">
+                            ${poem.content.split('\n').map(line => `<p class="mb-1">${line}</p>`).join('')}
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm" onclick="showAppreciation(${index})">
+                                <i class="fa fa-book-open mr-2"></i> 分析鉴赏
+                            </button>
+                            <button class="px-4 py-2 ${poem.mastered ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700'} rounded-lg hover:opacity-80 transition-all text-sm" onclick="toggleMastered(${index})">
+                                <i class="fa ${poem.mastered ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
+                                ${poem.mastered ? '已掌握' : '标记学习'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示诗词鉴赏
+        function showAppreciation(index) {
+            let allPoems = [];
+            Object.entries(poetryData).forEach(([key, poemList]) => {
+                allPoems.push(...poemList);
+            });
+            
+            const poem = allPoems[index];
+            if (!poem) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>${poem.title}</h3>
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="poem-info">
+                            <p><strong>作者：</strong>${poem.author}</p>
+                            <p><strong>年级：</strong>${poem.grade} ${poem.semester}</p>
+                        </div>
+                        <div class="poem-text">
+                            <h4>诗词原文：</h4>
+                            ${poem.content.split('\n').map(line => `<p>${line}</p>`).join('')}
+                        </div>
+                        <div class="poem-appreciation">
+                            <h4>鉴赏分析：</h4>
+                            <p>${poem.appreciation}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // 切换掌握状态
+        function toggleMastered(index) {
+            let allPoems = [];
+            let currentIndex = 0;
+            
+            Object.entries(poetryData).forEach(([key, poemList]) => {
+                poemList.forEach((poem, i) => {
+                    if (currentIndex === index) {
+                        poem.mastered = !poem.mastered;
+                        saveProgress();
+                        renderPoems();
+                        updateStatistics();
+                        return;
+                    }
+                    currentIndex++;
+                });
+            });
+        }
+
+        // 初始化文章鉴赏模块
+        function initArticlesSection() {
+            renderArticles();
+        }
+
+        // 渲染文章列表
+        function renderArticles() {
+            const container = document.getElementById('appreciationCards');
+            if (!container) return;
+            
+            container.innerHTML = articles.map((article, index) => `
+                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-bold text-neutral">${article.title}</h3>
+                            <span class="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">${article.type}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">${article.author}</p>
+                        <div class="text-sm text-gray-700 mb-6 leading-relaxed">
+                            <p>${article.content}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm" onclick="showArticleAppreciation(${index})">
+                                <i class="fa fa-eye mr-2"></i> 查看鉴赏
+                            </button>
+                            <button class="px-4 py-2 ${article.learned ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700'} rounded-lg hover:opacity-80 transition-all text-sm" onclick="toggleArticleLearned(${index})">
+                                <i class="fa ${article.learned ? 'fa-check-circle' : 'fa-circle'} mr-2"></i>
+                                ${article.learned ? '已学习' : '标记学习'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 显示文章鉴赏
+        function showArticleAppreciation(index) {
+            const article = articles[index];
+            if (!article) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>${article.title}</h3>
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="article-info">
+                            <p><strong>作者：</strong>${article.author}</p>
+                            <p><strong>类型：</strong>${article.type}</p>
+                        </div>
+                        <div class="article-text">
+                            <h4>文章内容：</h4>
+                            <p>${article.content}</p>
+                        </div>
+                        <div class="article-appreciation">
+                            <h4>鉴赏分析：</h4>
+                            <p>${article.appreciation}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'flex';
+        }
+
+        // 切换文章学习状态
+        function toggleArticleLearned(index) {
+            articles[index].learned = !articles[index].learned;
+            saveProgress();
+            renderArticles();
+            updateStatistics();
+        }
+
+        // 初始化写作目标模块
+        function initWritingGoalsSection() {
+            renderWritingGoals();
+        }
+
+        // 渲染写作目标
+        function renderWritingGoals() {
+            const container = document.getElementById('writingGoalsCards');
+            if (!container) return;
+            
+            container.innerHTML = writingGoals.map(gradeGoal => `
+                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-neutral mb-4">${gradeGoal.grade}</h3>
+                        <ul class="space-y-2">
+                            ${gradeGoal.goals.map(goal => `<li class="text-sm text-gray-700 flex items-start"><i class="fa fa-check-circle text-green-500 mr-2 mt-0.5"></i>${goal}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 初始化写作技巧模块
+        function initWritingTipsSection() {
+            renderWritingTips();
+        }
+
+        // 渲染写作技巧
+        function renderWritingTips() {
+            const container = document.getElementById('writingSkillsCards');
+            if (!container) return;
+            
+            container.innerHTML = writingTips.map(category => `
+                <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-neutral mb-4">${category.category}</h3>
+                        <ul class="space-y-2">
+                            ${category.tips.map(tip => `<li class="text-sm text-gray-700 flex items-start"><i class="fa fa-lightbulb text-yellow-500 mr-2 mt-0.5"></i>${tip}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 初始化统计功能
+        function initStatistics() {
+            loadProgress();
+            updateStatistics();
+        }
+
+        // 更新学习统计
+        function updateStatistics() {
+            // 计算古诗词掌握情况
+            let totalPoems = 0;
+            let masteredPoems = 0;
+            
+            Object.entries(poetryData).forEach(([key, poemList]) => {
+                totalPoems += poemList.length;
+                masteredPoems += poemList.filter(poem => poem.mastered).length;
+            });
+            
+            // 计算文章学习情况
+            const totalArticles = articles.length;
+            const learnedArticles = articles.filter(article => article.learned).length;
+            
+            // 更新进度条
+            const poemProgress = totalPoems > 0 ? (masteredPoems / totalPoems) * 100 : 0;
+            const articleProgress = totalArticles > 0 ? (learnedArticles / totalArticles) * 100 : 0;
+            
+            // 更新DOM
+            updateProgressBar('poetryProgressBar', 'poetryProgress', poemProgress, `${masteredPoems}/${totalPoems}`);
+            updateProgressBar('appreciationProgressBar', 'appreciationProgress', articleProgress, `${learnedArticles}/${totalArticles}`);
+        }
+
+        // 更新进度条
+        function updateProgressBar(barId, textId, percentage, text) {
+            const progressBar = document.getElementById(barId);
+            const progressText = document.getElementById(textId);
+            
+            if (progressBar) {
+                progressBar.style.width = percentage + '%';
+            }
+            if (progressText) {
+                progressText.textContent = text;
+            }
+        }
+
+        // 更新统计卡片
+        function updateStatCard(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        // 保存学习进度
+        function saveProgress() {
+            const progress = {
+                poems: poetryData,
+                articles: articles,
+                lastUpdated: new Date().toISOString()
+            };
+            localStorage.setItem('chineseLearnProgress', JSON.stringify(progress));
+        }
+
+        // 加载学习进度
+        function loadProgress() {
+            const saved = localStorage.getItem('chineseLearnProgress');
+            if (saved) {
+                try {
+                    const progress = JSON.parse(saved);
+                    if (progress.poems) {
+                        // 合并保存的进度
+                Object.keys(progress.poems).forEach(key => {
+                    if (poetryData[key]) {
+                        progress.poems[key].forEach((savedPoem, index) => {
+                            if (poetryData[key][index]) {
+                                poetryData[key][index].mastered = savedPoem.mastered || false;
+                            }
+                        });
+                    }
+                });
+            }
+            if (progress.articles) {
+                        progress.articles.forEach((savedArticle, index) => {
+                            if (articles[index]) {
+                                articles[index].learned = savedArticle.learned || false;
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('加载进度失败:', e);
+                }
+            }
+        }
+
+        // 返回顶部功能
+        function initBackToTop() {
+            const backToTopBtn = document.getElementById('backToTop');
+            if (!backToTopBtn) return;
+            
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.style.display = 'block';
+                } else {
+                    backToTopBtn.style.display = 'none';
+                }
+            });
+            
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // 主题切换功能
+        function initThemeToggle() {
+            const themeToggle = document.getElementById('themeToggle');
+            if (!themeToggle) return;
+            
+            // 加载保存的主题
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeToggleIcon(savedTheme);
+            
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeToggleIcon(newTheme);
+            });
+        }
+
+        // 更新主题切换图标
+        function updateThemeToggleIcon(theme) {
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                const icon = themeToggle.querySelector('i');
+                if (icon) {
+                    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+                }
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
+                    "心理描写：描写人物的内心活动"
+                ]
+            }
+        ];
