@@ -336,6 +336,22 @@
                         </button>
                     </div>
                 </div>
+                
+                <!-- 错题回顾区域 -->
+                <div id="wrongAnswersReview" class="hidden mt-6 bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-medium text-neutral">
+                            <i class="fa fa-exclamation-triangle text-orange-500 mr-2"></i>
+                            错题回顾与解析
+                        </h4>
+                        <button id="closeReview" class="text-gray-400 hover:text-gray-600">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                    <div id="wrongAnswersList" class="space-y-4">
+                        <!-- 错题列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -1157,9 +1173,9 @@
                 }
             });
             
-            // 查看答案
+            // 查看错题
             reviewAnswersBtn.addEventListener('click', function() {
-                showTestArea();
+                showWrongAnswersReview();
             });
             
             // 再测一次
@@ -1169,6 +1185,12 @@
                 
                 generateTestQuestions(testType, questionCount);
                 showTestArea();
+            });
+            
+            // 关闭错题回顾
+            const closeReviewBtn = document.getElementById('closeReview');
+            closeReviewBtn.addEventListener('click', function() {
+                hideWrongAnswersReview();
             });
         }
 
@@ -1401,24 +1423,94 @@
             container.appendChild(questionElement);
         }
 
+        // 生成错题解析
+        function generateExplanation(question, userAnswer, isCorrect) {
+            if (isCorrect) {
+                return '回答正确！';
+            }
+            
+            const item = question.originalItem;
+            let explanation = '';
+            
+            if (question.type === 'vocabulary') {
+                if (question.question.includes('中文意思')) {
+                    // 英译中题目
+                    explanation = `正确答案是「${question.correctAnswer}」。\n` +
+                                `单词「${item.word}」的含义：${item.explanation}\n` +
+                                `音标：${item.pronunciation}\n` +
+                                `词性：${item.category}`;
+                } else {
+                    // 中译英题目
+                    explanation = `正确答案是「${question.correctAnswer}」。\n` +
+                                `「${item.translation}」对应的英文单词是「${item.word}」\n` +
+                                `音标：${item.pronunciation}\n` +
+                                `记忆提示：${item.explanation}`;
+                }
+            } else if (question.type === 'grammar') {
+                if (question.question.includes('语法结构')) {
+                    // 语法识别题目
+                    explanation = `正确答案是「${question.correctAnswer}」。\n` +
+                                `句子「${item.example}」使用的语法结构：${item.title}\n` +
+                                `语法说明：${item.explanation}`;
+                } else {
+                    // 造句题目
+                    explanation = `参考答案：「${question.correctAnswer}」\n` +
+                                `语法结构「${item.title}」的用法：${item.explanation}\n` +
+                                `标准例句：${item.example}`;
+                }
+            }
+            
+            if (userAnswer && userAnswer !== '未作答') {
+                explanation = `你的答案：「${userAnswer}」\n\n` + explanation;
+            } else {
+                explanation = `你未作答此题。\n\n` + explanation;
+            }
+            
+            return explanation;
+        }
+
         // 完成测试
         function finishTest() {
-            // 计算得分
+            // 计算得分并记录详细答题结果
             let correctCount = 0;
+            const detailedResults = [];
+            
             testData.questions.forEach((question, index) => {
                 const userAnswer = testData.userAnswers[index];
-                if (userAnswer && userAnswer.toLowerCase() === question.correctAnswer.toLowerCase()) {
+                const isCorrect = userAnswer && userAnswer.toLowerCase() === question.correctAnswer.toLowerCase();
+                
+                if (isCorrect) {
                     correctCount++;
                 }
+                
+                // 记录每道题的详细结果
+                const questionResult = {
+                    questionIndex: index,
+                    question: question.question,
+                    userAnswer: userAnswer || '未作答',
+                    correctAnswer: question.correctAnswer,
+                    isCorrect: isCorrect,
+                    type: question.type,
+                    originalItem: question.originalItem,
+                    // 生成错题解析
+                    explanation: generateExplanation(question, userAnswer, isCorrect)
+                };
+                
+                detailedResults.push(questionResult);
             });
             
             const score = Math.round((correctCount / testData.questions.length) * 100);
             
-            // 保存测试结果
+            // 保存测试结果（包含详细答题记录）
             const testResult = {
                 date: new Date().toISOString(),
                 type: testData.currentTest,
                 score: score,
+                totalQuestions: testData.questions.length,
+                correctCount: correctCount,
+                wrongCount: testData.questions.length - correctCount,
+                detailedResults: detailedResults,
+                // 保留原有字段以兼容旧版本
                 questions: testData.questions,
                 answers: testData.userAnswers
             };
@@ -1444,6 +1536,9 @@
             
             // 更新历史得分
             renderTestHistory();
+            
+            // 保存当前测试结果到全局变量，供错题回顾使用
+            window.currentTestResult = testResult;
         }
 
         // 渲染测试历史
@@ -1468,6 +1563,82 @@
                 
                 container.appendChild(scoreElement);
             });
+        }
+        
+        // 显示错题回顾
+        function showWrongAnswersReview() {
+            const reviewContainer = document.getElementById('wrongAnswersReview');
+            const wrongAnswersList = document.getElementById('wrongAnswersList');
+            
+            if (!window.currentTestResult || !window.currentTestResult.detailedResults) {
+                alert('没有找到测试结果数据');
+                return;
+            }
+            
+            // 筛选出错题
+            const wrongAnswers = window.currentTestResult.detailedResults.filter(result => !result.isCorrect);
+            
+            if (wrongAnswers.length === 0) {
+                wrongAnswersList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fa fa-check-circle text-green-500 text-4xl mb-4"></i>
+                        <p class="text-lg font-medium">恭喜！本次测试全部答对！</p>
+                        <p class="text-sm">继续保持这种优秀的学习状态！</p>
+                    </div>
+                `;
+            } else {
+                wrongAnswersList.innerHTML = '';
+                
+                wrongAnswers.forEach((wrongAnswer, index) => {
+                    const wrongAnswerElement = document.createElement('div');
+                    wrongAnswerElement.className = 'border border-red-200 rounded-lg p-4 bg-red-50';
+                    
+                    wrongAnswerElement.innerHTML = `
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center">
+                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500 text-white text-sm font-medium mr-3">
+                                    ${wrongAnswer.questionIndex + 1}
+                                </span>
+                                <span class="text-sm font-medium text-gray-600">${wrongAnswer.type === 'vocabulary' ? '词汇题' : '语法题'}</span>
+                            </div>
+                            <i class="fa fa-times-circle text-red-500"></i>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p class="font-medium text-gray-800 mb-2">题目：</p>
+                            <p class="text-gray-700 bg-white p-2 rounded border">${wrongAnswer.question}</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <p class="font-medium text-red-600 mb-1">你的答案：</p>
+                                <p class="text-red-700 bg-red-100 p-2 rounded">${wrongAnswer.userAnswer}</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-green-600 mb-1">正确答案：</p>
+                                <p class="text-green-700 bg-green-100 p-2 rounded">${wrongAnswer.correctAnswer}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-red-200 pt-3">
+                            <p class="font-medium text-gray-800 mb-2">
+                                <i class="fa fa-lightbulb-o text-yellow-500 mr-1"></i>
+                                详细解析：
+                            </p>
+                            <div class="text-gray-700 bg-white p-3 rounded border whitespace-pre-line">${wrongAnswer.explanation}</div>
+                        </div>
+                    `;
+                    
+                    wrongAnswersList.appendChild(wrongAnswerElement);
+                });
+            }
+            
+            reviewContainer.classList.remove('hidden');
+        }
+        
+        // 隐藏错题回顾
+        function hideWrongAnswersReview() {
+            document.getElementById('wrongAnswersReview').classList.add('hidden');
         }
 
         // 初始化主题切换
