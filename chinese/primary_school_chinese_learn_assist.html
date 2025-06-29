@@ -702,7 +702,14 @@
             const container = document.getElementById('appreciationCards');
             if (!container) return;
             
-            container.innerHTML = articles.map((article, index) => `
+            // 使用window.articles确保访问全局变量
+            const articlesData = window.articles || [];
+            if (!Array.isArray(articlesData) || articlesData.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center text-gray-500">文章数据加载中...</div>';
+                return;
+            }
+            
+            container.innerHTML = articlesData.map((article, index) => `
                 <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-4">
@@ -729,7 +736,7 @@
 
         // 显示文章鉴赏
         function showArticleAppreciation(index) {
-            const article = articles[index];
+            const article = window.articles[index];
             if (!article) return;
             
             const modal = document.createElement('div');
@@ -763,7 +770,7 @@
 
         // 切换文章学习状态
         function toggleArticleLearned(index) {
-            articles[index].learned = !articles[index].learned;
+            window.articles[index].learned = !window.articles[index].learned;
             saveProgress();
             renderArticles();
             updateStatistics();
