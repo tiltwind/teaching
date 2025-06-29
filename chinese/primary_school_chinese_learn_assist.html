@@ -77,6 +77,17 @@
                 font-family: 'SimSun', '宋体', serif;
                 line-height: 1.6;
             }
+            /* 导航链接激活状态样式 */
+            .nav-link.active {
+                border-bottom-color: #3b82f6 !important;
+                color: #3b82f6 !important;
+            }
+            .mobile-menu .nav-link.active {
+                border-left-color: #3b82f6 !important;
+                color: #3b82f6 !important;
+                background-color: #eff6ff !important;
+            }
+            
             .modal {
                 position: fixed;
                 top: 0;
@@ -454,10 +465,10 @@
 
         // 初始化导航功能
         function initNavigation() {
-            const navLinks = document.querySelectorAll('.nav-link');
+            const navLinks = document.querySelectorAll('nav a[href^="#"]');
             const sections = document.querySelectorAll('section');
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileMenuBtn = document.querySelector('#mobileMenuButton');
+            const mobileMenu = document.querySelector('#mobileMenu');
 
             // 导航链接点击事件
             navLinks.forEach(link => {
@@ -483,7 +494,7 @@
                         
                         // 关闭移动端菜单
                         if (mobileMenu) {
-                            mobileMenu.classList.remove('active');
+                            mobileMenu.classList.add('hidden');
                         }
                     }
                 });
@@ -492,15 +503,24 @@
             // 移动端菜单切换
             if (mobileMenuBtn && mobileMenu) {
                 mobileMenuBtn.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('active');
+                    mobileMenu.classList.toggle('hidden');
                 });
             }
 
-            // 默认显示古诗词section
+            // 默认显示古诗词section，确保其他section可以通过导航访问
             sections.forEach(section => {
                 section.style.display = 'none';
             });
-            document.getElementById('poetry').style.display = 'block';
+            const defaultSection = document.getElementById('poetry');
+            if (defaultSection) {
+                defaultSection.style.display = 'block';
+            }
+            
+            // 设置默认激活的导航链接
+            const defaultNavLink = document.querySelector('a[href="#poetry"]');
+            if (defaultNavLink) {
+                defaultNavLink.classList.add('active');
+            }
         }
 
         // 初始化古诗词模块
