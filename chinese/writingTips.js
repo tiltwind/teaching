@@ -1,51 +1,3 @@
-/**
- * 小学语文写作相关数据
- * 包含文章范例、写作目标和写作技巧
- */
-
-// 文章范例数据
-const articles = [
-    {
-        title: "春天的故事",
-        author: "现代作家",
-        content: "春天来了，万物复苏...",
-        appreciation: "这篇文章通过对春天景色的描写，表达了对生命力的赞美。",
-        type: "写景",
-        learned: false
-    },
-    {
-        title: "我的老师",
-        author: "现代作家",
-        content: "我的老师是一位和蔼可亲的人...",
-        appreciation: "这篇文章通过具体事例展现了老师的品格，表达了对老师的敬爱之情。",
-        type: "写人",
-        learned: false
-    }
-];
-
-// 写作目标数据
-const writingGoals = [
-    {
-        grade: "四年级",
-        goals: [
-            "写作目的：乐于表达，增强自信",
-            "内容要求：把新奇有趣或受感动的内容写清楚",
-            "结构要求：语句连贯，段落初步形成",
-            "文体范围：不拘形式写见闻感受，简短书信便条",
-            "修改能力：修改有明显错误的词句"
-        ]
-    },
-    {
-        grade: "五年级",
-        goals: [
-            "写作目的：懂得为自我表达和与人交流而写作",
-            "内容要求：内容具体，感情真实，珍视独特感受",
-            "结构要求：能根据表达需要分段表述",
-            "文体范围：记实作文、想象作文、读书笔记、常见应用文",
-            "修改能力：主动与他人交换修改，关注整体质量"
-        ]
-    }
-];
 
 // 写作技巧数据
 const writingTips = [
@@ -95,13 +47,9 @@ const writingTips = [
 if (typeof module !== 'undefined' && module.exports) {
     // Node.js 环境
     module.exports = {
-        articles,
-        writingGoals,
         writingTips
     };
 } else {
     // 浏览器环境，将数据挂载到全局对象
-    window.articles = articles;
-    window.writingGoals = writingGoals;
     window.writingTips = writingTips;
 }
