@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小学数学学习助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#F59E0B',
+                        accent: '#10B981',
+                        neutral: '#1F2937',
+                        'neutral-light': '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-flip {
+                perspective: 1000px;
+                transform-style: preserve-3d;
+            }
+            .card-front, .card-back {
+                backface-visibility: hidden;
+                transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .card-back {
+                transform: rotateY(180deg);
+            }
+            .card-flipped .card-front {
+                transform: rotateY(180deg);
+            }
+            .card-flipped .card-back {
+                transform: rotateY(0deg);
+            }
+            .progress-animation {
+                transition: width 1s ease-in-out;
+            }
+            .slide-in {
+                animation: slideIn 0.5s ease-out forwards;
+            }
+            @keyframes slideIn {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            .pulse {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            .math-formula {
+                font-family: 'Times New Roman', serif;
+                font-size: 1.1em;
+            }
+            .card-flip {
+                perspective: 1000px;
+            }
+            .card-front, .card-back {
+                backface-visibility: hidden;
+                transition: transform 0.6s;
+            }
+            .card-back {
+                transform: rotateY(180deg);
+            }
+            .card-flip:hover .card-front {
+                transform: rotateY(180deg);
+            }
+            .card-flip:hover .card-back {
+                transform: rotateY(0deg);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen font-sans">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md fixed w-full z-50 transition-all duration-300" id="mainNav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0 flex items-center">
+                        <i class="fa fa-calculator text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-neutral">小学数学学习助手</span>
+                    </a>
+                    <div class="hidden sm:ml-6 sm:flex space-x-8">
+                        <a href="#knowledge" class="border-primary text-primary border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium">
+                            <i class="fa fa-book mr-1"></i> 知识学习
+                        </a>
+                        <a href="#practice" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium">
+                            <i class="fa fa-pencil mr-1"></i> 练习题库
+                        </a>
+                        <a href="#test" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium">
+                            <i class="fa fa-check-square-o mr-1"></i> 知识测试
+                        </a>
+                        <a href="#stats" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium">
+                            <i class="fa fa-bar-chart mr-1"></i> 学习统计
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="themeToggle" class="p-2 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <i class="fa fa-moon-o"></i>
+                    </button>
+                    <button type="button" class="ml-4 p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none sm:hidden" id="mobileMenuButton">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="sm:hidden hidden" id="mobileMenu">
+            <div class="px-2 pt-2 pb-3 space-y-1 bg-white shadow-lg">
+                <a href="#knowledge" class="bg-primary/10 text-primary block pl-3 pr-4 py-2 border-l-4 border-primary text-base font-medium">
+                    <i class="fa fa-book mr-1"></i> 知识学习
+                </a>
+                <a href="#practice" class="border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium">
+                    <i class="fa fa-pencil mr-1"></i> 练习题库
+                </a>
+                <a href="#test" class="border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium">
+                    <i class="fa fa-check-square-o mr-1"></i> 知识测试
+                </a>
+                <a href="#stats" class="border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium">
+                    <i class="fa fa-bar-chart mr-1"></i> 学习统计
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <header class="pt-24 pb-12 md:pt-32 md:pb-20 bg-gradient-to-r from-primary to-secondary text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight mb-4">
+                    小学数学学习助手
+                </h1>
+                <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/80 max-w-3xl mx-auto mb-8">
+                    轻松掌握人教版小学五年级数学知识点，通过互动学习和测试巩固记忆
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#knowledge" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent transition-all duration-300 transform hover:scale-105">
+                        <i class="fa fa-book mr-2"></i> 开始学习
+                    </a>
+                    <a href="#test" class="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-all duration-300 transform hover:scale-105">
+                        <i class="fa fa-check-square-o mr-2"></i> 立即测试
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- 知识学习部分 -->
+        <section id="knowledge" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">
+                    <i class="fa fa-book text-primary mr-2"></i> 知识学习
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    掌握五年级数学核心知识点，通过卡片学习法加深理解
+                </p>
+            </div>
+
+            <!-- 知识筛选和控制 -->
+            <div class="mb-8 bg-white rounded-xl shadow-md p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-neutral mb-2">筛选知识点</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="knowledge-filter-btn px-4 py-2 rounded-full bg-primary text-white text-sm font-medium" data-filter="all">全部</button>
+                            <button class="knowledge-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="上册">上册</button>
+                            <button class="knowledge-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="下册">下册</button>
+                            <button class="knowledge-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="计算">计算</button>
+                            <button class="knowledge-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="几何">几何</button>
+                            <button class="knowledge-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="应用">应用</button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="knowledgeShuffle" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
+                            <i class="fa fa-random mr-2"></i> 随机排序
+                        </button>
+                        <button id="knowledgeReset" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
+                            <i class="fa fa-refresh mr-2"></i> 重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 知识卡片网格 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="knowledgeCards">
+                <!-- 知识卡片将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 练习题库部分 -->
+        <section id="practice" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">
+                    <i class="fa fa-pencil text-primary mr-2"></i> 练习题库
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    通过大量练习题巩固数学知识，提高解题能力
+                </p>
+            </div>
+
+            <!-- 练习筛选和控制 -->
+            <div class="mb-8 bg-white rounded-xl shadow-md p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-neutral mb-2">筛选练习题</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="practice-filter-btn px-4 py-2 rounded-full bg-primary text-white text-sm font-medium" data-filter="all">全部</button>
+                            <button class="practice-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="上册">上册</button>
+                            <button class="practice-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="下册">下册</button>
+                            <button class="practice-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="基础">基础题</button>
+                            <button class="practice-filter-btn px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200" data-filter="提高">提高题</button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="practiceShuffle" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
+                            <i class="fa fa-random mr-2"></i> 随机排序
+                        </button>
+                        <button id="practiceReset" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
+                            <i class="fa fa-refresh mr-2"></i> 重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 练习题卡片网格 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="practiceCards">
+                <!-- 练习题卡片将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 测试部分 -->
+        <section id="test" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">
+                    <i class="fa fa-check-square-o text-primary mr-2"></i> 知识测试
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    通过测试检验学习成果，随机出题，包含选择题和计算题
+                </p>
+            </div>
+
+            <!-- 测试设置 -->
+            <div class="mb-8 bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto">
+                <h3 class="text-lg font-semibold text-neutral mb-4">测试设置</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="testType" class="block text-sm font-medium text-gray-700 mb-1">测试类型</label>
+                        <select id="testType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50">
+                            <option value="mixed">混合测试（计算+应用）</option>
+                            <option value="calculation">计算测试</option>
+                            <option value="application">应用测试</option>
+                            <option value="geometry">几何测试</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="questionCount" class="block text-sm font-medium text-gray-700 mb-1">题目数量</label>
+                        <select id="questionCount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50">
+                            <option value="5">5题</option>
+                            <option value="10" selected>10题</option>
+                            <option value="15">15题</option>
+                            <option value="20">20题</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button id="startTest" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 transform hover:scale-[1.02]">
+                        <i class="fa fa-play-circle mr-2"></i> 开始测试
+                    </button>
+                </div>
+            </div>
+
+            <!-- 测试区域 (默认隐藏) -->
+            <div id="testArea" class="hidden max-w-3xl mx-auto">
+                <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold text-neutral" id="testTitle">数学测试</h3>
+                        <div class="flex items-center">
+                            <span class="text-sm text-gray-500 mr-2">进度:</span>
+                            <div class="w-32 bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-primary h-2.5 rounded-full progress-animation" id="testProgressBar" style="width: 0%"></div>
+                            </div>
+                            <span class="ml-2 text-sm font-medium" id="testProgressText">0/10</span>
+                        </div>
+                    </div>
+
+                    <div id="questionContainer" class="mb-8">
+                        <!-- 题目内容将通过JavaScript动态生成 -->
+                    </div>
+
+                    <div id="answerFeedback" class="mb-6 hidden">
+                        <div id="correctFeedback" class="hidden bg-green-50 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+                            <strong class="font-bold">正确!</strong>
+                            <span class="block sm:inline" id="correctAnswerText"></span>
+                        </div>
+                        <div id="incorrectFeedback" class="hidden bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                            <strong class="font-bold">错误!</strong>
+                            <span class="block sm:inline" id="incorrectAnswerText"></span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button id="prevQuestion" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fa fa-arrow-left mr-1"></i> 上一题
+                        </button>
+                        <button id="nextQuestion" class="px-4 py-2 border border-transparent rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                            下一题 <i class="fa fa-arrow-right mr-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 测试结果 (默认隐藏) -->
+            <div id="testResults" class="hidden max-w-3xl mx-auto">
+                <div class="bg-white rounded-xl shadow-md p-8 text-center">
+                    <div class="mb-6">
+                        <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-100 text-green-600 mb-4">
+                            <i class="fa fa-trophy text-4xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-neutral mb-2">测试完成!</h3>
+                        <p class="text-gray-600 mb-4">你的得分已保存到本地</p>
+                        <div class="text-4xl font-bold text-primary mb-6" id="finalScore">0/10</div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-lg font-medium text-neutral mb-3">历史得分</h4>
+                        <div id="scoreHistory" class="grid grid-cols-2 sm:grid-cols-5 gap-2 max-w-lg mx-auto">
+                            <!-- 历史得分将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <button id="reviewAnswers" class="px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <i class="fa fa-book mr-1"></i> 查看错题
+                        </button>
+                        <button id="retakeTest" class="px-6 py-3 border border-transparent rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <i class="fa fa-refresh mr-1"></i> 再测一次
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 错题回顾区域 -->
+                <div id="wrongAnswersReview" class="hidden mt-6 bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-medium text-neutral">
+                            <i class="fa fa-exclamation-triangle text-orange-500 mr-2"></i>
+                            错题回顾与解析
+                        </h4>
+                        <button id="closeReview" class="text-gray-400 hover:text-gray-600">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                    <div id="wrongAnswersList" class="space-y-4">
+                        <!-- 错题列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 统计部分 -->
+        <section id="stats" class="mb-20 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral mb-4">
+                    <i class="fa fa-bar-chart text-primary mr-2"></i> 学习统计
+                </h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">
+                    查看你的学习进度和成绩统计，激励自己不断进步
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <!-- 学习进度卡片 -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-neutral mb-4">学习进度</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-medium">知识学习</span>
+                                <span id="knowledgeProgressText">0/0</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-primary h-2.5 rounded-full progress-animation" id="knowledgeProgressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-medium">练习完成</span>
+                                <span id="practiceProgressText">0/0</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-secondary h-2.5 rounded-full progress-animation" id="practiceProgressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-medium">测试完成率</span>
+                                <span id="testProgressText">0/0</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-accent h-2.5 rounded-full progress-animation" id="testProgressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 测试成绩卡片 -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-neutral mb-4">测试成绩</h3>
+                    <div id="scoreChart" class="h-64">
+                        <!-- Chart.js 图表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学习建议 -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold text-neutral mb-4">学习建议</h3>
+                <div id="learningTips" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- 学习建议将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-neutral text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">小学数学学习助手</h3>
+                    <p class="text-gray-400 mb-4">
+                        帮助小学生轻松掌握数学知识，提高学习效率和成绩
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">学习资源</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#knowledge" class="text-gray-400 hover:text-white transition-colors">知识学习</a></li>
+                        <li><a href="#practice" class="text-gray-400 hover:text-white transition-colors">练习题库</a></li>
+                        <li><a href="#test" class="text-gray-400 hover:text-white transition-colors">知识测试</a></li>
+                        <li><a href="#stats" class="text-gray-400 hover:text-white transition-colors">学习统计</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">关于我们</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">使用指南</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">常见问题</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">联系我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">隐私政策</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">订阅更新</h4>
+                    <p class="text-gray-400 mb-4">
+                        获取最新学习资料和教育资讯
+                    </p>
+                    <form class="space-y-2">
+                        <div>
+                            <input type="email" placeholder="输入你的邮箱" class="w-full px-4 py-2 rounded-md bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <button type="submit" class="w-full px-4 py-2 bg-primary hover:bg-primary/90 rounded-md text-white font-medium transition-colors">
+                            订阅
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 小学数学学习助手. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script>
+        // 数学学习数据
+        const mathData = {
+            knowledge: [
+                // 五年级上册 - 小数乘法
+                {
+                    title: "小数乘法的计算方法",
+                    content: "先按整数乘法算出积，再看因数中一共有几位小数，就从积的右边起数出几位，点上小数点。",
+                    example: "2.5 × 1.3 = 3.25\n计算：25 × 13 = 325\n因数共有2位小数，所以结果为3.25",
+                    formula: "小数乘法 = 整数乘法 + 小数点定位",
+                    category: "计算",
+                    volume: "上册",
+                    chapter: "小数乘法"
+                },
+                {
+                    title: "积的小数位数规律",
+                    content: "若积的末尾有0，需先点小数点再去掉0。积的小数位数等于两个因数小数位数之和。",
+                    example: "2.4 × 0.5 = 1.20 = 1.2\n2.4有1位小数，0.5有1位小数\n积应有2位小数",
+                    formula: "积的小数位数 = 因数1小数位数 + 因数2小数位数",
+                    category: "计算",
+                    volume: "上册",
+                    chapter: "小数乘法"
+                },
+                {
+                    title: "小数乘法运算定律",
+                    content: "整数乘法运算定律同样适用于小数乘法：交换律、结合律、分配律。",
+                    example: "交换律：0.5 × 3.6 = 3.6 × 0.5\n分配律：(2.5 + 1.5) × 4 = 2.5 × 4 + 1.5 × 4",
+                    formula: "a × b = b × a\n(a + b) × c = a × c + b × c",
+                    category: "计算",
+                    volume: "上册",
+                    chapter: "小数乘法"
+                },
+                // 五年级上册 - 小数除法
+                {
+                    title: "除数是整数的小数除法",
+                    content: "按整数除法计算，商的小数点与被除数的小数点对齐。",
+                    example: "22.5 ÷ 5 = 4.5\n按整数除法：225 ÷ 5 = 45\n商的小数点与被除数对齐",
+                    formula: "被除数 ÷ 整数除数 = 商（小数点对齐）",
+                    category: "计算",
+                    volume: "上册",
+                    chapter: "小数除法"
+                },
+                {
+                    title: "除数是小数的除法",
+                    content: "先把除数化为整数（被除数同倍数扩大），再按整数除法计算。",
+                    example: "1.26 ÷ 0.3 = 12.6 ÷ 3 = 4.2\n除数扩大10倍，被除数也扩大10倍",
+                    formula: "小数除法 → 整数除法（同倍数扩大）",
+                    category: "计算",
+                    volume: "上册",
+                    chapter: "小数除法"
+                },
+                {
+                    title: "循环小数",
+                    content: "小数部分从某一位起，一个或几个数字依次不断重复出现的小数。",
+                    example: "3.333... = 3.3̄\n1.5656... = 1.56̄\n用小圆点表示循环节",
+                    formula: "循环小数记号：在循环节首末位上点小圆点",
+                    category: "计算",
+                    volume: "上册",
+                    chapter: "小数除法"
+                },
+                // 五年级上册 - 简易方程
+                {
+                    title: "用字母表示数",
+                    content: "字母可以表示数、运算定律、公式。数字在前，字母在后，乘号可省略。",
+                    example: "正方形面积：S = a²\n周长：C = 4a\n3 × a = 3a",
+                    formula: "字母表示数的规则：数字×字母 = 数字字母",
+                    category: "应用",
+                    volume: "上册",
+                    chapter: "简易方程"
+                },
+                {
+                    title: "方程的意义",
+                    content: "含有未知数的等式叫做方程。方程是等式，但等式不一定是方程。",
+                    example: "3x + 5 = 14（方程）\n5 + 3 = 8（等式，不是方程）",
+                    formula: "方程 = 含未知数的等式",
+                    category: "应用",
+                    volume: "上册",
+                    chapter: "简易方程"
+                },
+                {
+                    title: "等式的性质",
+                    content: "等式两边加、减、乘、除以同一个数（除数不为0），等式仍然成立。",
+                    example: "如果a = b，那么：\na + c = b + c\na - c = b - c\na × c = b × c\na ÷ c = b ÷ c（c≠0）",
+                    formula: "等式性质：两边同时进行相同运算",
+                    category: "应用",
+                    volume: "上册",
+                    chapter: "简易方程"
+                },
+                // 五年级上册 - 多边形面积
+                {
+                    title: "平行四边形面积",
+                    content: "平行四边形的面积等于底乘以高。底和高必须相对应。",
+                    example: "底 = 6cm，高 = 4cm\n面积 = 6 × 4 = 24cm²",
+                    formula: "S = a × h（底×高）",
+                    category: "几何",
+                    volume: "上册",
+                    chapter: "多边形面积"
+                },
+                {
+                    title: "三角形面积",
+                    content: "三角形面积等于底乘以高除以2。由平行四边形面积推导而来。",
+                    example: "底 = 8cm，高 = 6cm\n面积 = 8 × 6 ÷ 2 = 24cm²",
+                    formula: "S = a × h ÷ 2",
+                    category: "几何",
+                    volume: "上册",
+                    chapter: "多边形面积"
+                },
+                {
+                    title: "梯形面积",
+                    content: "梯形面积等于上底加下底的和乘以高除以2。",
+                    example: "上底 = 3cm，下底 = 7cm，高 = 4cm\n面积 = (3 + 7) × 4 ÷ 2 = 20cm²",
+                    formula: "S = (a + b) × h ÷ 2",
+                    category: "几何",
+                    volume: "上册",
+                    chapter: "多边形面积"
+                },
+                // 五年级下册 - 因数与倍数
+                {
+                    title: "因数和倍数的概念",
+                    content: "如果a×b=c，那么a和b是c的因数，c是a和b的倍数。",
+                    example: "2 × 3 = 6\n2和3是6的因数\n6是2和3的倍数",
+                    formula: "a × b = c → a,b是c的因数，c是a,b的倍数",
+                    category: "计算",
+                    volume: "下册",
+                    chapter: "因数与倍数"
+                },
+                {
+                    title: "2、5、3的倍数特征",
+                    content: "2的倍数：个位是0,2,4,6,8；5的倍数：个位是0或5；3的倍数：各位数字之和是3的倍数。",
+                    example: "24是2的倍数（个位是4）\n35是5的倍数（个位是5）\n123是3的倍数（1+2+3=6）",
+                    formula: "倍数特征：看个位数字或数字和",
+                    category: "计算",
+                    volume: "下册",
+                    chapter: "因数与倍数"
+                },
+                {
+                    title: "质数与合数",
+                    content: "质数：只有1和它本身两个因数。合数：除1和它本身外还有其他因数。1既不是质数也不是合数。",
+                    example: "质数：2,3,5,7,11,13...\n合数：4,6,8,9,10,12...\n特殊：1既不是质数也不是合数",
+                    formula: "质数：因数只有1和本身\n合数：因数超过2个",
+                    category: "计算",
+                    volume: "下册",
+                    chapter: "因数与倍数"
+                },
+                // 五年级下册 - 分数的意义和性质
+                {
+                    title: "分数的意义",
+                    content: "把单位'1'平均分成若干份，表示这样的一份或几份的数叫做分数。",
+                    example: "3/4表示把单位'1'平均分成4份，取其中3份",
+                    formula: "分数 = 部分/整体",
+                    category: "计算",
+                    volume: "下册",
+                    chapter: "分数的意义和性质"
+                },
+                {
+                    title: "分数的基本性质",
+                    content: "分数的分子和分母同时乘或除以相同的数（0除外），分数大小不变。",
+                    example: "1/2 = 2/4 = 3/6\n分子分母同时乘以2或3",
+                    formula: "a/b = (a×c)/(b×c) = (a÷c)/(b÷c)",
+                    category: "计算",
+                    volume: "下册",
+                    chapter: "分数的意义和性质"
+                },
+                // 五年级下册 - 长方体和正方体
+                {
+                    title: "长方体的特征",
+                    content: "6个面、12条棱、8个顶点。相对的面相等，相对的棱长度相等。",
+                    example: "长方体有3组相对的面\n每组相对的面完全相同\n棱长总和=(长+宽+高)×4",
+                    formula: "棱长总和 = (a + b + h) × 4",
+                    category: "几何",
+                    volume: "下册",
+                    chapter: "长方体和正方体"
+                },
+                {
+                    title: "长方体表面积",
+                    content: "长方体6个面的面积总和。包括3组相对的面。",
+                    example: "长=5cm，宽=3cm，高=2cm\n表面积=(5×3+5×2+3×2)×2=62cm²",
+                    formula: "S = (ab + ah + bh) × 2",
+                    category: "几何",
+                    volume: "下册",
+                    chapter: "长方体和正方体"
+                },
+                {
+                    title: "长方体体积",
+                    content: "长方体体积等于长乘以宽乘以高，也等于底面积乘以高。",
+                    example: "长=4cm，宽=3cm，高=2cm\n体积=4×3×2=24cm³",
+                    formula: "V = a × b × h = S底 × h",
+                    category: "几何",
+                    volume: "下册",
+                    chapter: "长方体和正方体"
+                }
+            ],
+            
+            practice: [
+                // 小数乘法练习题
+                {
+                    question: "计算：2.5 × 1.4",
+                    options: ["3.5", "3.6", "3.4", "3.8"],
+                    answer: "3.5",
+                    explanation: "先算25×14=350，因数共有2位小数，所以结果为3.50=3.5",
+                    type: "choice",
+                    category: "计算",
+                    volume: "上册",
+                    difficulty: "基础",
+                    chapter: "小数乘法"
+                },
+                {
+                    question: "计算：0.25 × 4",
+                    answer: "1",
+                    explanation: "0.25×4=1，这是一个常见的计算结果",
+                    type: "fill",
+                    category: "计算",
+                    volume: "上册",
+                    difficulty: "基础",
+                    chapter: "小数乘法"
+                },
+                {
+                    question: "用简便方法计算：1.25 × 0.8 × 2.5",
+                    answer: "2.5",
+                    explanation: "1.25×0.8=1，1×2.5=2.5。利用乘法结合律简化计算",
+                    type: "fill",
+                    category: "计算",
+                    volume: "上册",
+                    difficulty: "提高",
+                    chapter: "小数乘法"
+                },
+                // 小数除法练习题
+                {
+                    question: "计算：12.6 ÷ 3",
+                    options: ["4.2", "4.3", "4.1", "4.4"],
+                    answer: "4.2",
+                    explanation: "按整数除法计算126÷3=42，商的小数点与被除数对齐，结果为4.2",
+                    type: "choice",
+                    category: "计算",
+                    volume: "上册",
+                    difficulty: "基础",
+                    chapter: "小数除法"
+                },
+                {
+                    question: "计算：1.44 ÷ 0.12",
+                    answer: "12",
+                    explanation: "除数扩大100倍变为12，被除数也扩大100倍变为144，144÷12=12",
+                    type: "fill",
+                    category: "计算",
+                    volume: "上册",
+                    difficulty: "基础",
+                    chapter: "小数除法"
+                },
+                // 简易方程练习题
+                {
+                    question: "解方程：x + 15 = 23",
+                    answer: "8",
+                    explanation: "等式两边同时减去15：x = 23 - 15 = 8",
+                    type: "fill",
+                    category: "应用",
+                    volume: "上册",
+                    difficulty: "基础",
+                    chapter: "简易方程"
+                },
+                {
+                    question: "解方程：3x = 21",
+                    answer: "7",
+                    explanation: "等式两边同时除以3：x = 21 ÷ 3 = 7",
+                    type: "fill",
+                    category: "应用",
+                    volume: "上册",
+                    difficulty: "基础",
+                    chapter: "简易方程"
+                },
+                {
+                    question: "小明买了5支铅笔，每支x元，一共花了10元。列方程求每支铅笔的价格。",
+                    answer: "5x = 10, x = 2",
+                    explanation: "根据题意列方程：5x = 10，解得x = 2，每支铅笔2元",
+                    type: "fill",
+                    category: "应用",
+                    volume: "上册",
+                    difficulty: "提高",
+                    chapter: "简易方程"
+                },
+                // 多边形面积练习题
+                {
+                    question: "平行四边形的底是8cm，高是5cm，面积是多少？",
+                    options: ["40cm²", "13cm²", "20cm²", "30cm²"],
+                    answer: "40cm²",
+                    explanation: "平行四边形面积 = 底 × 高 = 8 × 5 = 40cm²",
+                    type: "choice",
+                    category: "几何",
+                    volume: "上册",
+                    difficulty: "基础",
+                    chapter: "多边形面积"
+                },
+                {
+                    question: "三角形的底是12cm，高是8cm，面积是多少？",
+                    answer: "48",
+                    explanation: "三角形面积 = 底 × 高 ÷ 2 = 12 × 8 ÷ 2 = 48cm²",
+                    type: "fill",
+                    category: "几何",
+                    volume: "上册",
+                    difficulty: "基础",
+                    chapter: "多边形面积"
+                },
+                {
+                    question: "梯形的上底是6cm，下底是10cm，高是4cm，面积是多少？",
+                    answer: "32",
+                    explanation: "梯形面积 = (上底 + 下底) × 高 ÷ 2 = (6 + 10) × 4 ÷ 2 = 32cm²",
+                    type: "fill",
+                    category: "几何",
+                    volume: "上册",
+                    difficulty: "基础",
+                    chapter: "多边形面积"
+                },
+                // 因数与倍数练习题
+                {
+                    question: "下面哪个数是24的因数？",
+                    options: ["5", "7", "8", "9"],
+                    answer: "8",
+                    explanation: "24 = 8 × 3，所以8是24的因数",
+                    type: "choice",
+                    category: "计算",
+                    volume: "下册",
+                    difficulty: "基础",
+                    chapter: "因数与倍数"
+                },
+                {
+                    question: "在15、18、21、25中，3的倍数有哪些？",
+                    answer: "15、18、21",
+                    explanation: "3的倍数特征：各位数字之和是3的倍数。15(1+5=6)、18(1+8=9)、21(2+1=3)都是3的倍数",
+                    type: "fill",
+                    category: "计算",
+                    volume: "下册",
+                    difficulty: "基础",
+                    chapter: "因数与倍数"
+                },
+                // 分数练习题
+                {
+                    question: "把3/4化成分母是12的分数",
+                    answer: "9/12",
+                    explanation: "根据分数基本性质，分子分母同时乘以3：3/4 = 9/12",
+                    type: "fill",
+                    category: "计算",
+                    volume: "下册",
+                    difficulty: "基础",
+                    chapter: "分数的意义和性质"
+                },
+                {
+                    question: "比较大小：2/3 ○ 3/4",
+                    answer: "<",
+                    explanation: "通分：2/3 = 8/12，3/4 = 9/12，因为8 < 9，所以2/3 < 3/4",
+                    type: "fill",
+                    category: "计算",
+                    volume: "下册",
+                    difficulty: "基础",
+                    chapter: "分数的意义和性质"
+                },
+                // 长方体和正方体练习题
+                {
+                    question: "长方体的长是6cm，宽是4cm，高是3cm，表面积是多少？",
+                    answer: "108",
+                    explanation: "表面积 = (6×4 + 6×3 + 4×3) × 2 = (24 + 18 + 12) × 2 = 108cm²",
+                    type: "fill",
+                    category: "几何",
+                    volume: "下册",
+                    difficulty: "基础",
+                    chapter: "长方体和正方体"
+                },
+                {
+                    question: "正方体的棱长是5cm，体积是多少？",
+                    options: ["125cm³", "75cm³", "100cm³", "150cm³"],
+                    answer: "125cm³",
+                    explanation: "正方体体积 = 棱长³ = 5³ = 125cm³",
+                    type: "choice",
+                    category: "几何",
+                    volume: "下册",
+                    difficulty: "基础",
+                    chapter: "长方体和正方体"
+                }
+            ]
+        };
+
+        // 定义知识数据
+        const knowledgeData = mathData.knowledge;
+
+        // 全局变量
+        let currentKnowledgeFilter = 'all';
+        let currentPracticeFilter = 'all';
+        let currentTest = null;
+        let currentQuestionIndex = 0;
+        let testAnswers = [];
+        let testStartTime = null;
+        let scoreChart = null;
+
+        // 页面加载完成后初始化
+        // 移除重复的初始化调用，统一在initializePage中处理
+
+        // 初始化知识卡片
+        function initKnowledgeCards() {
+            const container = document.getElementById('knowledgeCards');
+            renderKnowledgeCards(knowledgeData);
+
+            // 筛选按钮事件
+            document.querySelectorAll('.knowledge-filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 更新按钮状态
+                    document.querySelectorAll('.knowledge-filter-btn').forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    this.classList.remove('bg-gray-100', 'text-gray-700');
+                    this.classList.add('bg-primary', 'text-white');
+
+                    // 筛选数据
+                    currentKnowledgeFilter = this.dataset.filter;
+                    const filteredData = filterKnowledgeData(knowledgeData, currentKnowledgeFilter);
+                    renderKnowledgeCards(filteredData);
+                });
+            });
+
+            // 随机排序
+            document.getElementById('knowledgeShuffle').addEventListener('click', function() {
+                const filteredData = filterKnowledgeData(knowledgeData, currentKnowledgeFilter);
+                const shuffledData = [...filteredData].sort(() => Math.random() - 0.5);
+                renderKnowledgeCards(shuffledData);
+            });
+
+            // 重置
+            document.getElementById('knowledgeReset').addEventListener('click', function() {
+                currentKnowledgeFilter = 'all';
+                document.querySelectorAll('.knowledge-filter-btn').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                document.querySelector('[data-filter="all"]').classList.remove('bg-gray-100', 'text-gray-700');
+                document.querySelector('[data-filter="all"]').classList.add('bg-primary', 'text-white');
+                renderKnowledgeCards(knowledgeData);
+            });
+        }
+
+        // 渲染知识卡片
+        function renderKnowledgeCards(data) {
+            const container = document.getElementById('knowledgeCards');
+            container.innerHTML = '';
+
+            data.forEach((item, index) => {
+                const cardId = `knowledge-card-${index}`;
+                const isLearned = getLearnedStatus(item.title);
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] relative';
+                card.style.minHeight = '280px';
+                card.innerHTML = `
+                    <div class="card-main p-6" id="${cardId}-main">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">${item.chapter}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">${item.volume}</span>
+                                <button class="learn-status-btn ${isLearned ? 'text-green-600' : 'text-gray-400'} hover:text-green-600 transition-colors" 
+                                        data-title="${item.title}" title="${isLearned ? '已掌握' : '标记为已掌握'}">
+                                    <i class="fa ${isLearned ? 'fa-check-circle' : 'fa-circle-o'} text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-neutral mb-3 line-clamp-2">${item.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">${item.content}</p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <span class="text-xs text-gray-500">${item.category}</span>
+                            <button class="show-details-btn px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 text-sm font-medium transition-colors" 
+                                    data-card-id="${cardId}">
+                                <i class="fa fa-book mr-1"></i> 公式和范例
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-details p-6 bg-gradient-to-br from-primary/5 to-secondary/5 hidden" id="${cardId}-details">
+                        <div class="h-full flex flex-col">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-lg font-semibold text-neutral">公式与示例</h4>
+                                <button class="back-btn px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm transition-colors" 
+                                        data-card-id="${cardId}">
+                                    <i class="fa fa-arrow-left mr-1"></i> 返回
+                                </button>
+                            </div>
+                            <div class="space-y-4 flex-1">
+                                <div class="bg-white rounded-lg p-4">
+                                    <div class="text-sm font-medium text-gray-700 mb-2">📐 公式</div>
+                                    <div class="math-formula text-primary font-medium text-lg">${item.formula}</div>
+                                </div>
+                                <div class="bg-white rounded-lg p-4">
+                                    <div class="text-sm font-medium text-gray-700 mb-2">💡 示例</div>
+                                    <div class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">${item.example}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // 添加事件监听器
+                const showDetailsBtn = card.querySelector('.show-details-btn');
+                const backBtn = card.querySelector('.back-btn');
+                const learnStatusBtn = card.querySelector('.learn-status-btn');
+                const mainDiv = card.querySelector(`#${cardId}-main`);
+                const detailsDiv = card.querySelector(`#${cardId}-details`);
+
+                // 显示详情
+                showDetailsBtn.addEventListener('click', function() {
+                    mainDiv.classList.add('hidden');
+                    detailsDiv.classList.remove('hidden');
+                });
+
+                // 返回主视图
+                backBtn.addEventListener('click', function() {
+                    detailsDiv.classList.add('hidden');
+                    mainDiv.classList.remove('hidden');
+                });
+
+                // 标记学习状态
+                learnStatusBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const title = this.dataset.title;
+                    const currentStatus = getLearnedStatus(title);
+                    setLearnedStatus(title, !currentStatus);
+                    
+                    if (!currentStatus) {
+                        this.innerHTML = '<i class="fa fa-check-circle text-lg"></i>';
+                        this.className = 'learn-status-btn text-green-600 hover:text-green-600 transition-colors';
+                        this.title = '已掌握';
+                        
+                        // 添加成功动画
+                        this.style.transform = 'scale(1.2)';
+                        setTimeout(() => {
+                            this.style.transform = 'scale(1)';
+                        }, 200);
+                    } else {
+                        this.innerHTML = '<i class="fa fa-circle-o text-lg"></i>';
+                        this.className = 'learn-status-btn text-gray-400 hover:text-green-600 transition-colors';
+                        this.title = '标记为已掌握';
+                    }
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        // 筛选知识数据
+        function filterKnowledgeData(data, filter) {
+            if (filter === 'all') return data;
+            return data.filter(item => {
+                return item.volume.includes(filter) || item.category.includes(filter);
+            });
+        }
+
+        // 初始化练习卡片
+        function initPracticeCards() {
+            renderPracticeCards(mathData.practice);
+
+            // 筛选按钮事件
+            document.querySelectorAll('.practice-filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 更新按钮状态
+                    document.querySelectorAll('.practice-filter-btn').forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    this.classList.remove('bg-gray-100', 'text-gray-700');
+                    this.classList.add('bg-primary', 'text-white');
+
+                    // 筛选数据
+                    currentPracticeFilter = this.dataset.filter;
+                    const filteredData = filterPracticeData(mathData.practice, currentPracticeFilter);
+                    renderPracticeCards(filteredData);
+                });
+            });
+
+            // 随机排序
+            document.getElementById('practiceShuffle').addEventListener('click', function() {
+                const filteredData = filterPracticeData(mathData.practice, currentPracticeFilter);
+                const shuffledData = [...filteredData].sort(() => Math.random() - 0.5);
+                renderPracticeCards(shuffledData);
+            });
+
+            // 重置
+            document.getElementById('practiceReset').addEventListener('click', function() {
+                currentPracticeFilter = 'all';
+                document.querySelectorAll('.practice-filter-btn').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                document.querySelector('.practice-filter-btn[data-filter="all"]').classList.remove('bg-gray-100', 'text-gray-700');
+                document.querySelector('.practice-filter-btn[data-filter="all"]').classList.add('bg-primary', 'text-white');
+                renderPracticeCards(mathData.practice);
+            });
+        }
+
+        // 渲染练习卡片
+        function renderPracticeCards(data) {
+            const container = document.getElementById('practiceCards');
+            container.innerHTML = '';
+
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] p-6';
+                
+                const optionsHtml = item.type === 'choice' ? 
+                    `<div class="mt-4">
+                        <div class="text-sm font-medium text-gray-700 mb-2">选择答案：</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            ${item.options.map((option, i) => 
+                                `<button class="practice-option px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 text-left" data-answer="${option}">${String.fromCharCode(65 + i)}. ${option}</button>`
+                            ).join('')}
+                        </div>
+                    </div>` : 
+                    `<div class="mt-4">
+                        <div class="text-sm font-medium text-gray-700 mb-2">填写答案：</div>
+                        <input type="text" class="practice-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="请输入答案">
+                    </div>`;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-3 py-1 bg-secondary/10 text-secondary text-xs font-medium rounded-full">${item.chapter}</span>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">${item.volume}</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded">${item.difficulty}</span>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-neutral mb-3">${item.question}</h3>
+                    ${optionsHtml}
+                    <div class="mt-4 flex justify-between items-center">
+                        <button class="practice-check-btn px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 text-sm font-medium">检查答案</button>
+                        <span class="text-xs text-gray-500">${item.category}</span>
+                    </div>
+                    <div class="practice-result mt-4 hidden">
+                        <div class="p-3 rounded-lg">
+                            <div class="practice-feedback font-medium mb-2"></div>
+                            <div class="practice-explanation text-sm text-gray-600"></div>
+                        </div>
+                    </div>
+                `;
+
+                // 添加练习题交互
+                const checkBtn = card.querySelector('.practice-check-btn');
+                const resultDiv = card.querySelector('.practice-result');
+                const feedbackDiv = card.querySelector('.practice-feedback');
+                const explanationDiv = card.querySelector('.practice-explanation');
+
+                checkBtn.addEventListener('click', function() {
+                    let userAnswer = '';
+                    if (item.type === 'choice') {
+                        const selectedOption = card.querySelector('.practice-option.selected');
+                        userAnswer = selectedOption ? selectedOption.dataset.answer : '';
+                    } else {
+                        userAnswer = card.querySelector('.practice-input').value.trim();
+                    }
+
+                    if (!userAnswer) {
+                        alert('请先选择或填写答案！');
+                        return;
+                    }
+
+                    const isCorrect = checkMathAnswer(userAnswer, item.answer);
+                    
+                    resultDiv.classList.remove('hidden');
+                    if (isCorrect) {
+                        resultDiv.className = 'practice-result mt-4 bg-green-50 border border-green-200';
+                        feedbackDiv.className = 'practice-feedback font-medium mb-2 text-green-700';
+                        feedbackDiv.textContent = '✅ 答案正确！';
+                    } else {
+                        resultDiv.className = 'practice-result mt-4 bg-red-50 border border-red-200';
+                        feedbackDiv.className = 'practice-feedback font-medium mb-2 text-red-700';
+                        feedbackDiv.textContent = `❌ 答案错误！正确答案是：${item.answer}`;
+                    }
+                    explanationDiv.textContent = item.explanation;
+                    
+                    checkBtn.textContent = '重新练习';
+                    checkBtn.onclick = () => location.reload();
+                });
+
+                // 选择题选项点击事件
+                if (item.type === 'choice') {
+                    card.querySelectorAll('.practice-option').forEach(option => {
+                        option.addEventListener('click', function() {
+                            card.querySelectorAll('.practice-option').forEach(opt => {
+                                opt.classList.remove('selected', 'bg-primary', 'text-white');
+                                opt.classList.add('hover:bg-gray-50');
+                            });
+                            this.classList.add('selected', 'bg-primary', 'text-white');
+                            this.classList.remove('hover:bg-gray-50');
+                        });
+                    });
+                }
+
+                container.appendChild(card);
+            });
+        }
+
+        // 筛选练习数据
+        function filterPracticeData(data, filter) {
+            if (filter === 'all') return data;
+            return data.filter(item => {
+                return item.volume.includes(filter) || item.difficulty.includes(filter);
+            });
+        }
+
+        // 检查数学答案
+        function checkMathAnswer(userAnswer, correctAnswer) {
+            // 标准化答案格式
+            const normalizeAnswer = (answer) => {
+                return answer.toString().toLowerCase().replace(/\s+/g, '').replace(/[，,]/g, '、');
+            };
+            
+            const normalizedUser = normalizeAnswer(userAnswer);
+            const normalizedCorrect = normalizeAnswer(correctAnswer);
+            
+            // 直接匹配
+            if (normalizedUser === normalizedCorrect) return true;
+            
+            // 数值匹配（处理小数、分数等）
+            try {
+                const userNum = parseFloat(userAnswer);
+                const correctNum = parseFloat(correctAnswer);
+                if (!isNaN(userNum) && !isNaN(correctNum)) {
+                    return Math.abs(userNum - correctNum) < 0.001;
+                }
+            } catch (e) {}
+            
+            // 包含匹配（用于多个答案的情况）
+            if (normalizedCorrect.includes('、')) {
+                const correctAnswers = normalizedCorrect.split('、');
+                return correctAnswers.some(ans => normalizedUser.includes(ans.trim()));
+            }
+            
+            return false;
+        }
+
+        // 初始化测试功能
+        function initTestFunctionality() {
+            const startTestBtn = document.getElementById('startTest');
+            const testArea = document.getElementById('testArea');
+            const testResults = document.getElementById('testResults');
+            const testSetup = testArea.previousElementSibling;
+
+            startTestBtn.addEventListener('click', function() {
+                const testType = document.getElementById('testType').value;
+                const questionCount = parseInt(document.getElementById('questionCount').value);
+                
+                // 生成测试题目
+                currentTest = generateTest(testType, questionCount);
+                currentQuestionIndex = 0;
+                testAnswers = new Array(currentTest.questions.length).fill(null);
+                testStartTime = new Date();
+                
+                // 显示测试区域
+                testSetup.classList.add('hidden');
+                testArea.classList.remove('hidden');
+                testResults.classList.add('hidden');
+                
+                // 显示第一题
+                showQuestion(0);
+                updateTestProgress();
+            });
+
+            // 上一题按钮
+            document.getElementById('prevQuestion').addEventListener('click', function() {
+                if (currentQuestionIndex > 0) {
+                    saveCurrentAnswer();
+                    currentQuestionIndex--;
+                    showQuestion(currentQuestionIndex);
+                    updateTestProgress();
+                }
+            });
+
+            // 下一题按钮
+            document.getElementById('nextQuestion').addEventListener('click', function() {
+                saveCurrentAnswer();
+                if (currentQuestionIndex < currentTest.questions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion(currentQuestionIndex);
+                    updateTestProgress();
+                } else {
+                    finishTest();
+                }
+            });
+
+            // 再测一次按钮
+            document.getElementById('retakeTest').addEventListener('click', function() {
+                testResults.classList.add('hidden');
+                testSetup.classList.remove('hidden');
+                testArea.classList.add('hidden');
+            });
+
+            // 查看错题按钮
+            document.getElementById('reviewAnswers').addEventListener('click', function() {
+                showWrongAnswersReview();
+            });
+
+            // 关闭错题回顾
+            document.getElementById('closeReview').addEventListener('click', function() {
+                document.getElementById('wrongAnswersReview').classList.add('hidden');
+            });
+        }
+
+        // 生成测试
+        function generateTest(testType, questionCount) {
+            let availableQuestions = [...mathData.practice];
+            
+            // 根据测试类型筛选题目
+            if (testType !== 'mixed') {
+                const typeMap = {
+                    'calculation': '计算',
+                    'application': '应用',
+                    'geometry': '几何'
+                };
+                availableQuestions = availableQuestions.filter(q => q.category === typeMap[testType]);
+            }
+            
+            // 随机选择题目
+            const shuffled = availableQuestions.sort(() => Math.random() - 0.5);
+            const selectedQuestions = shuffled.slice(0, Math.min(questionCount, shuffled.length));
+            
+            return {
+                type: testType,
+                questions: selectedQuestions,
+                startTime: new Date()
+            };
+        }
+
+        // 显示题目
+        function showQuestion(index) {
+            const question = currentTest.questions[index];
+            const container = document.getElementById('questionContainer');
+            
+            const optionsHtml = question.type === 'choice' ? 
+                `<div class="mt-6">
+                    <div class="text-sm font-medium text-gray-700 mb-3">请选择正确答案：</div>
+                    <div class="space-y-2">
+                        ${question.options.map((option, i) => 
+                            `<label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="radio" name="testAnswer" value="${option}" class="mr-3 text-primary focus:ring-primary">
+                                <span>${String.fromCharCode(65 + i)}. ${option}</span>
+                            </label>`
+                        ).join('')}
+                    </div>
+                </div>` : 
+                `<div class="mt-6">
+                    <div class="text-sm font-medium text-gray-700 mb-3">请填写答案：</div>
+                    <input type="text" id="testAnswerInput" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-lg" placeholder="请输入你的答案">
+                </div>`;
+
+            container.innerHTML = `
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-500">第 ${index + 1} 题</span>
+                        <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">${question.chapter}</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-neutral mb-2">${question.question}</h3>
+                    <div class="flex gap-2">
+                        <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">${question.category}</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded">${question.difficulty}</span>
+                    </div>
+                </div>
+                ${optionsHtml}
+            `;
+            
+            // 恢复之前的答案
+            if (testAnswers[index]) {
+                if (question.type === 'choice') {
+                    const radio = container.querySelector(`input[value="${testAnswers[index]}"]`);
+                    if (radio) radio.checked = true;
+                } else {
+                    const input = container.querySelector('#testAnswerInput');
+                    if (input) input.value = testAnswers[index];
+                }
+            }
+            
+            // 更新按钮状态
+            document.getElementById('prevQuestion').disabled = index === 0;
+            const nextBtn = document.getElementById('nextQuestion');
+            if (index === currentTest.questions.length - 1) {
+                nextBtn.innerHTML = '完成测试 <i class="fa fa-check ml-1"></i>';
+            } else {
+                nextBtn.innerHTML = '下一题 <i class="fa fa-arrow-right ml-1"></i>';
+            }
+        }
+
+        // 保存当前答案
+        function saveCurrentAnswer() {
+            const question = currentTest.questions[currentQuestionIndex];
+            let answer = '';
+            
+            if (question.type === 'choice') {
+                const selected = document.querySelector('input[name="testAnswer"]:checked');
+                answer = selected ? selected.value : '';
+            } else {
+                const input = document.getElementById('testAnswerInput');
+                answer = input ? input.value.trim() : '';
+            }
+            
+            testAnswers[currentQuestionIndex] = answer;
+        }
+
+        // 更新测试进度
+        function updateTestProgress() {
+            const progress = ((currentQuestionIndex + 1) / currentTest.questions.length) * 100;
+            document.getElementById('testProgressBar').style.width = progress + '%';
+            document.getElementById('testProgressText').textContent = `${currentQuestionIndex + 1}/${currentTest.questions.length}`;
+        }
+
+        // 完成测试
+        function finishTest() {
+            saveCurrentAnswer();
+            
+            // 计算得分
+            let correctCount = 0;
+            const detailedResults = [];
+            
+            currentTest.questions.forEach((question, index) => {
+                const userAnswer = testAnswers[index] || '';
+                const isCorrect = checkMathAnswer(userAnswer, question.answer);
+                if (isCorrect) correctCount++;
+                
+                detailedResults.push({
+                    question: question.question,
+                    userAnswer: userAnswer,
+                    correctAnswer: question.answer,
+                    isCorrect: isCorrect,
+                    explanation: generateExplanation(question, userAnswer, isCorrect)
+                });
+            });
+            
+            const score = correctCount;
+            const total = currentTest.questions.length;
+            const percentage = Math.round((score / total) * 100);
+            
+            // 保存测试结果
+            saveTestResult({
+                score: score,
+                total: total,
+                percentage: percentage,
+                testType: currentTest.type,
+                date: new Date().toISOString(),
+                duration: Math.round((new Date() - testStartTime) / 1000),
+                details: detailedResults
+            });
+            
+            // 显示结果
+            showTestResults(score, total, percentage, detailedResults);
+        }
+
+        // 生成解析
+        function generateExplanation(question, userAnswer, isCorrect) {
+            if (isCorrect) {
+                return `🎉 答案正确！${question.explanation}`;
+            } else {
+                return `📚 ${question.explanation}`;
+            }
+        }
+
+        // 显示测试结果
+        function showTestResults(score, total, percentage, details) {
+            document.getElementById('testArea').classList.add('hidden');
+            document.getElementById('testResults').classList.remove('hidden');
+            
+            // 更新得分显示
+            document.getElementById('finalScore').textContent = `${score}/${total}`;
+            
+            // 更新图标和颜色
+            const resultIcon = document.querySelector('#testResults .fa-trophy').parentElement;
+            if (percentage >= 80) {
+                resultIcon.className = 'inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-100 text-green-600 mb-4';
+                resultIcon.innerHTML = '<i class="fa fa-trophy text-4xl"></i>';
+            } else if (percentage >= 60) {
+                resultIcon.className = 'inline-flex items-center justify-center w-24 h-24 rounded-full bg-yellow-100 text-yellow-600 mb-4';
+                resultIcon.innerHTML = '<i class="fa fa-star text-4xl"></i>';
+            } else {
+                resultIcon.className = 'inline-flex items-center justify-center w-24 h-24 rounded-full bg-red-100 text-red-600 mb-4';
+                resultIcon.innerHTML = '<i class="fa fa-refresh text-4xl"></i>';
+            }
+            
+            // 显示历史得分
+            updateScoreHistory();
+            
+            // 保存错题记录
+            const wrongAnswers = details.filter(d => !d.isCorrect);
+            if (wrongAnswers.length > 0) {
+                localStorage.setItem('mathWrongAnswers', JSON.stringify(wrongAnswers));
+                document.getElementById('reviewAnswers').classList.remove('hidden');
+            } else {
+                document.getElementById('reviewAnswers').classList.add('hidden');
+            }
+        }
+
+        // 显示错题回顾
+        function showWrongAnswersReview() {
+            const wrongAnswers = JSON.parse(localStorage.getItem('mathWrongAnswers') || '[]');
+            const reviewDiv = document.getElementById('wrongAnswersReview');
+            const listDiv = document.getElementById('wrongAnswersList');
+            
+            if (wrongAnswers.length === 0) {
+                listDiv.innerHTML = '<div class="text-center py-8 text-gray-500">🎉 太棒了！没有错题需要回顾。</div>';
+            } else {
+                listDiv.innerHTML = wrongAnswers.map((item, index) => `
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-start justify-between mb-2">
+                            <h5 class="font-medium text-neutral">第 ${index + 1} 题</h5>
+                            <span class="px-2 py-1 bg-red-100 text-red-600 text-xs rounded">错误</span>
+                        </div>
+                        <div class="mb-3">
+                            <div class="text-sm text-gray-600 mb-1">题目：</div>
+                            <div class="text-gray-800">${item.question}</div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">你的答案：</div>
+                                <div class="text-red-600 font-medium">${item.userAnswer || '未作答'}</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">正确答案：</div>
+                                <div class="text-green-600 font-medium">${item.correctAnswer}</div>
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 border border-blue-200 rounded p-3">
+                            <div class="text-sm text-blue-800">${item.explanation}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            reviewDiv.classList.remove('hidden');
+        }
+
+        // 保存测试结果
+        function saveTestResult(result) {
+            const results = JSON.parse(localStorage.getItem('mathTestResults') || '[]');
+            results.push(result);
+            // 只保留最近20次测试结果
+            if (results.length > 20) {
+                results.splice(0, results.length - 20);
+            }
+            localStorage.setItem('mathTestResults', JSON.stringify(results));
+        }
+
+        // 更新得分历史
+        function updateScoreHistory() {
+            const results = JSON.parse(localStorage.getItem('mathTestResults') || '[]');
+            const historyDiv = document.getElementById('scoreHistory');
+            
+            if (results.length === 0) {
+                historyDiv.innerHTML = '<div class="text-center text-gray-500">暂无测试记录</div>';
+                return;
+            }
+            
+            const recent5 = results.slice(-5).reverse();
+            historyDiv.innerHTML = recent5.map(result => {
+                const date = new Date(result.date).toLocaleDateString();
+                const colorClass = result.percentage >= 80 ? 'text-green-600' : 
+                                 result.percentage >= 60 ? 'text-yellow-600' : 'text-red-600';
+                return `
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                        <span class="text-sm text-gray-600">${date}</span>
+                        <span class="font-medium ${colorClass}">${result.score}/${result.total}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 更新统计数据
+        function updateStatistics() {
+            const results = JSON.parse(localStorage.getItem('mathTestResults') || '[]');
+            
+            // 安全地更新DOM元素
+            const updateElement = (id, value) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            };
+            
+            if (results.length === 0) {
+                updateElement('totalTests', '0');
+                updateElement('averageScore', '0%');
+                updateElement('bestScore', '0%');
+                updateElement('weakestTopic', '暂无数据');
+                return;
+            }
+            
+            // 总测试次数
+            updateElement('totalTests', results.length);
+            
+            // 平均分
+            const avgPercentage = Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / results.length);
+            updateElement('averageScore', avgPercentage + '%');
+            
+            // 最高分
+            const bestPercentage = Math.max(...results.map(r => r.percentage));
+            updateElement('bestScore', bestPercentage + '%');
+            
+            // 薄弱知识点分析
+            const topicStats = {};
+            results.forEach(result => {
+                if (result.details) {
+                    result.details.forEach(detail => {
+                        const topic = detail.question.split('：')[0] || '其他';
+                        if (!topicStats[topic]) {
+                            topicStats[topic] = { correct: 0, total: 0 };
+                        }
+                        topicStats[topic].total++;
+                        if (detail.isCorrect) {
+                            topicStats[topic].correct++;
+                        }
+                    });
+                }
+            });
+            
+            let weakestTopic = '暂无数据';
+            let lowestRate = 1;
+            for (const [topic, stats] of Object.entries(topicStats)) {
+                const rate = stats.correct / stats.total;
+                if (rate < lowestRate) {
+                    lowestRate = rate;
+                    weakestTopic = topic;
+                }
+            }
+            
+            updateElement('weakestTopic', weakestTopic);
+        }
+
+        // 获取学习建议
+        function getLearningAdvice() {
+            const results = JSON.parse(localStorage.getItem('mathTestResults') || '[]');
+            
+            if (results.length === 0) {
+                return '开始你的数学学习之旅吧！建议先从基础知识点开始学习。';
+            }
+            
+            const recent = results.slice(-3);
+            const avgRecent = recent.reduce((sum, r) => sum + r.percentage, 0) / recent.length;
+            
+            if (avgRecent >= 90) {
+                return '🌟 优秀！你的数学基础非常扎实，建议挑战更高难度的题目，或者帮助同学一起学习。';
+            } else if (avgRecent >= 80) {
+                return '👍 很好！继续保持，建议重点复习错题，巩固薄弱环节。';
+            } else if (avgRecent >= 60) {
+                return '📚 还需努力！建议回顾基础知识点，多做练习题，特别关注计算准确性。';
+            } else {
+                return '💪 加油！建议从基础概念开始，逐步建立知识体系，不要急于求成。';
+            }
+        }
+
+        // 学习状态管理函数
+        function getLearnedStatus(title) {
+            const learnedItems = JSON.parse(localStorage.getItem('learnedKnowledge') || '[]');
+            return learnedItems.includes(title);
+        }
+
+        function setLearnedStatus(title, isLearned) {
+            let learnedItems = JSON.parse(localStorage.getItem('learnedKnowledge') || '[]');
+            
+            if (isLearned && !learnedItems.includes(title)) {
+                learnedItems.push(title);
+            } else if (!isLearned && learnedItems.includes(title)) {
+                learnedItems = learnedItems.filter(item => item !== title);
+            }
+            
+            localStorage.setItem('learnedKnowledge', JSON.stringify(learnedItems));
+            
+            // 更新统计数据
+            updateLearningProgress();
+        }
+
+        function updateLearningProgress() {
+            const learnedItems = JSON.parse(localStorage.getItem('learnedKnowledge') || '[]');
+            const totalItems = knowledgeData.length;
+            const learnedCount = learnedItems.length;
+            const progressPercentage = totalItems > 0 ? Math.round((learnedCount / totalItems) * 100) : 0;
+            
+            // 更新进度显示（如果有的话）
+            const progressElement = document.querySelector('.learning-progress');
+            if (progressElement) {
+                progressElement.textContent = `学习进度: ${learnedCount}/${totalItems} (${progressPercentage}%)`;
+            }
+        }
+
+        // 初始化导航功能
+        function initNavigation() {
+            // 滚动效果
+            const nav = document.getElementById('mainNav');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 10) {
+                    nav.classList.add('bg-white/95', 'backdrop-blur-sm');
+                    nav.classList.remove('bg-white');
+                } else {
+                    nav.classList.remove('bg-white/95', 'backdrop-blur-sm');
+                    nav.classList.add('bg-white');
+                }
+            });
+            
+            // 移动端菜单
+            const menuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (menuButton && mobileMenu) {
+                menuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+                
+                // 点击菜单项后关闭菜单
+                const menuItems = mobileMenu.querySelectorAll('a');
+                menuItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        mobileMenu.classList.add('hidden');
+                    });
+                });
+            }
+        }
+
+        // 初始化页面
+        function initializePage() {
+            // 初始化导航
+            initNavigation();
+            
+            // 初始化知识卡片
+            initKnowledgeCards();
+            
+            // 初始化练习卡片
+            initPracticeCards();
+            
+            // 初始化测试功能
+            initTestFunctionality();
+            
+            // 初始化统计
+            updateStatistics();
+            
+            // 更新学习进度
+            updateLearningProgress();
+            
+            // 更新学习建议
+            const adviceElement = document.getElementById('learningAdvice');
+            if (adviceElement) {
+                adviceElement.textContent = getLearningAdvice();
+            }
+            
+            // 返回顶部功能
+            const backToTopBtn = document.getElementById('backToTop');
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.classList.remove('hidden');
+                } else {
+                    backToTopBtn.classList.add('hidden');
+                }
+            });
+            
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // 主题切换（如果需要）
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    document.documentElement.classList.toggle('dark');
+                    localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+                });
+                
+                // 恢复主题设置
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
