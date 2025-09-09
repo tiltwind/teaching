@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优秀作文展示平台</title>
+    <link rel="stylesheet" href="good_writing_example.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="header">
+            <h1>优秀作文展示平台</h1>
+            <p>探索优秀作文，感受文字的力量</p>
+        </div>
+
+        <!-- 标签筛选区域 -->
+        <div class="tag-filter">
+            <h3>📚 按标签筛选文章</h3>
+            <div id="tag-filter"></div>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <div class="content">
+            <!-- 文章列表视图 -->
+            <div id="article-list-view" class="article-list-view">
+                <div id="article-list" class="article-list"></div>
+            </div>
+
+            <!-- 文章详情视图 -->
+            <div id="article-detail" class="article-detail">
+                <button class="back-btn" onclick="backToList()">← 返回列表</button>
+                <h2 id="detail-title" class="detail-title"></h2>
+                <div id="detail-tags" class="detail-tags"></div>
+                <div id="detail-content" class="detail-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入JavaScript文件 -->
+    <script src="good_writing_example.js"></script>
+</body>
+</html>
