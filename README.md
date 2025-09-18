@@ -3,6 +3,7 @@
 ## 教育方式
 
 - [惩罚孩子](punish-child)
+- [表扬孩子](praise-your-children.html)
 
 
 ## 习惯
