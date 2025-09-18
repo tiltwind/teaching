@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>300句鼓励孩子的话术</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .search-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .stat-item {
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .introduction {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .introduction h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .problems-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .problems-list h3 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+
+        .problems-list ul {
+            list-style: none;
+        }
+
+        .problems-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .problems-list li:before {
+            content: "❌ ";
+            margin-right: 10px;
+        }
+
+        .philosophy {
+            margin: 20px 0;
+        }
+
+        .philosophy p {
+            margin-bottom: 15px;
+            text-align: justify;
+            line-height: 1.8;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .section.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .section-description {
+            color: #666;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        .section-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .expand-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .expand-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .phrase-count {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .phrases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .phrase-card {
+            background: linear-gradient(135deg, #e8f4fd 0%, #d1ecf1 100%);
+            color: #2c3e50;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .phrase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .phrase-card:nth-child(even) {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+
+        .phrase-card:nth-child(3n) {
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+
+        .phrase-number {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .phrase-text {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+
+        .random-phrase {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .random-phrase h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .random-text {
+            font-size: 1.2rem;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .random-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .random-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .highlight-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .highlight-box p {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: white;
+            opacity: 0.8;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .collapsed {
+            max-height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .collapsed::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(transparent, white);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .phrases-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header fade-in">
+            <h1 id="main-title">300句鼓励孩子的话术</h1>
+            <p id="main-subtitle">这些口头禅天天说，孩子想不优秀都难</p>
+        </header>
+
+        <div class="search-container fade-in">
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="搜索鼓励话语...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="total-phrases">300</div>
+                    <div class="stat-label">鼓励话语</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="visible-phrases">300</div>
+                    <div class="stat-label">当前显示</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">主题分类</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="introduction fade-in" id="introduction">
+            <h2>为什么要鼓励孩子？</h2>
+            <div class="problems-list">
+                <h3>常见问题：</h3>
+                <ul id="problems-list"></ul>
+            </div>
+            <div class="philosophy" id="philosophy"></div>
+        </div>
+
+        <div class="random-phrase fade-in">
+            <h3>💡 每日一句鼓励</h3>
+            <div class="random-text" id="random-text">点击按钮获取随机鼓励话语</div>
+            <button class="random-btn" onclick="showRandomPhrase()">换一句</button>
+        </div>
+
+        <div id="sections-container"></div>
+
+        <div class="highlight-box fade-in">
+            <h3>💡 使用建议</h3>
+            <div id="tips-container"></div>
+        </div>
+
+        <footer class="footer fade-in">
+            <p>愿每个孩子都能在鼓励中茁壮成长 ❤️</p>
+            <p>© 2024 家庭教育指南</p>
+        </footer>
+    </div>
+
+    <script src="praise-your-children.js"></script>
+    <script>
+        let currentData = praiseData;
+        let allPhrases = [];
+        let expandedSections = new Set();
+
+        // 初始化页面
+        function initializePage() {
+            // 设置标题和副标题
+            document.getElementById('main-title').textContent = currentData.title;
+            document.getElementById('main-subtitle').textContent = currentData.subtitle;
+
+            // 渲染介绍部分
+            renderIntroduction();
+
+            // 收集所有话语
+            collectAllPhrases();
+
+            // 渲染所有部分
+            renderSections();
+
+            // 添加滚动动画
+            addScrollAnimations();
+
+            // 显示随机话语
+            showRandomPhrase();
+        }
+
+        // 渲染介绍部分
+        function renderIntroduction() {
+            const problemsList = document.getElementById('problems-list');
+            const philosophy = document.getElementById('philosophy');
+
+            // 渲染问题列表
+            currentData.introduction.problems.forEach(problem => {
+                const li = document.createElement('li');
+                li.textContent = problem;
+                problemsList.appendChild(li);
+            });
+
+            // 渲染教育理念
+            currentData.introduction.philosophy.forEach(text => {
+                const p = document.createElement('p');
+                p.textContent = text;
+                philosophy.appendChild(p);
+            });
+        }
+
+        // 收集所有话语
+        function collectAllPhrases() {
+            allPhrases = [];
+            currentData.sections.forEach(section => {
+                section.phrases.forEach((phrase, index) => {
+                    allPhrases.push({
+                        text: phrase,
+                        section: section.title,
+                        sectionId: section.id,
+                        number: allPhrases.length + 1
+                    });
+                });
+            });
+        }
+
+        // 渲染所有部分
+        function renderSections() {
+            const container = document.getElementById('sections-container');
+            container.innerHTML = '';
+
+            currentData.sections.forEach((section, sectionIndex) => {
+                const sectionElement = createSectionElement(section, sectionIndex);
+                container.appendChild(sectionElement);
+            });
+        }
+
+        // 创建部分元素
+        function createSectionElement(section, sectionIndex) {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'section fade-in';
+            sectionDiv.id = section.id;
+
+            const isExpanded = expandedSections.has(section.id);
+            const displayPhrases = isExpanded ? section.phrases : section.phrases.slice(0, 6);
+
+            sectionDiv.innerHTML = `
+                <h2>${section.title}</h2>
+                <p class="section-description">${section.description}</p>
+                <div class="section-controls">
+                    <span class="phrase-count">共 ${section.phrases.length} 句话语</span>
+                    <button class="expand-btn" onclick="toggleSection('${section.id}')">
+                        ${isExpanded ? '收起' : '展开全部'}
+                    </button>
+                </div>
+                <div class="phrases-grid" id="${section.id}-grid">
+                    ${renderPhrases(displayPhrases, sectionIndex * 100)}
+                </div>
+            `;
+
+            return sectionDiv;
+        }
+
+        // 渲染话语卡片
+        function renderPhrases(phrases, startNumber = 0) {
+            return phrases.map((phrase, index) => `
+                <div class="phrase-card" onclick="copyToClipboard('${phrase.replace(/'/g, "\\'")}')">
+                    <div class="phrase-number">${startNumber + index + 1}</div>
+                    <div class="phrase-text">${phrase}</div>
+                </div>
+            `).join('');
+        }
+
+        // 切换部分展开/收起
+        function toggleSection(sectionId) {
+            const section = currentData.sections.find(s => s.id === sectionId);
+            if (!section) return;
+
+            if (expandedSections.has(sectionId)) {
+                expandedSections.delete(sectionId);
+            } else {
+                expandedSections.add(sectionId);
+            }
+
+            // 重新渲染该部分
+            const sectionElement = document.getElementById(sectionId);
+            const newElement = createSectionElement(section, currentData.sections.indexOf(section));
+            sectionElement.parentNode.replaceChild(newElement, sectionElement);
+
+            // 重新添加动画
+            setTimeout(() => {
+                newElement.classList.add('fade-in');
+            }, 10);
+        }
+
+        // 搜索功能
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                
+                if (searchTerm === '') {
+                    renderSections();
+                    updateVisibleCount(allPhrases.length);
+                    return;
+                }
+
+                const filteredPhrases = allPhrases.filter(phrase => 
+                    phrase.text.toLowerCase().includes(searchTerm)
+                );
+
+                renderSearchResults(filteredPhrases, searchTerm);
+                updateVisibleCount(filteredPhrases.length);
+            });
+        }
+
+        // 渲染搜索结果
+        function renderSearchResults(filteredPhrases, searchTerm) {
+            const container = document.getElementById('sections-container');
+            
+            if (filteredPhrases.length === 0) {
+                container.innerHTML = `
+                    <div class="section fade-in">
+                        <div class="no-results">
+                            <h3>未找到相关内容</h3>
+                            <p>尝试使用其他关键词搜索</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="section fade-in">
+                    <h2>搜索结果</h2>
+                    <p class="section-description">找到 ${filteredPhrases.length} 条相关话语</p>
+                    <div class="phrases-grid">
+                        ${filteredPhrases.map(phrase => `
+                            <div class="phrase-card" onclick="copyToClipboard('${phrase.text.replace(/'/g, "\\'")}')">
+                                <div class="phrase-number">${phrase.number}</div>
+                                <div class="phrase-text">${highlightSearchTerm(phrase.text, searchTerm)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 高亮搜索词
+        function highlightSearchTerm(text, searchTerm) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<mark style="background: rgba(255,255,255,0.3); padding: 2px 4px; border-radius: 3px;">$1</mark>');
+        }
+
+        // 更新可见数量
+        function updateVisibleCount(count) {
+            document.getElementById('visible-phrases').textContent = count;
+        }
+
+        // 显示随机话语
+        function showRandomPhrase() {
+            if (allPhrases.length === 0) return;
+            
+            const randomPhrase = allPhrases[Math.floor(Math.random() * allPhrases.length)];
+            document.getElementById('random-text').textContent = randomPhrase.text;
+        }
+
+        // 复制到剪贴板
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // 显示复制成功提示
+                showToast('已复制到剪贴板！');
+            }).catch(() => {
+                // 降级方案
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('已复制到剪贴板！');
+            });
+        }
+
+        // 显示提示消息
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 6px;
+                z-index: 1000;
+                font-size: 14px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+
+        // 添加滚动动画
+        function addScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.section, .introduction, .random-phrase, .highlight-box').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // 渲染使用建议
+        function renderTips() {
+            const tipsContainer = document.getElementById('tips-container');
+            currentData.tips.forEach(tip => {
+                const p = document.createElement('p');
+                p.textContent = tip;
+                tipsContainer.appendChild(p);
+            });
+        }
+
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            setupSearch();
+            renderTips();
+        });
+    </script>
+</body>
+</html>
