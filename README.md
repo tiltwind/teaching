@@ -20,6 +20,8 @@
 - [小学英语学习助手](english/primary_school_english_learn_assit.html) - 英语学习辅导工具
 - [小学数学学习助手](math/primary_school_math_learn_assist.html) - 数学学习辅导工具
 
+- [好文章范例](chinese/good-article-example.html)
+
 ### 教育资源
 
 - [厦门中小学家庭教育讲坛](xiamen-primary-middle-school-family-teach)
